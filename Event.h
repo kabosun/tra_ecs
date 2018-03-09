@@ -8,7 +8,6 @@ struct EntityDeadEvent
 struct Contact
 {
 	EntityId EntityId;
-	FFixFloatVector2 Point;
 };
 
 struct CollisionBeginEvent
