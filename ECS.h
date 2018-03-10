@@ -9,18 +9,19 @@ void ECS()
 {
 	//auto TransformComponents = std::shared_ptr<ComponentRegistry<TransformComponent>>();
 
-	WorldSystem WorldSystem;
+	WorldSystem& WorldSystem = WorldSystem::GetInstance();
 
-	// コンポーネントタイプを登録する
 	WorldSystem.AddComponentRegistry<TransformComponent>();
 	WorldSystem.AddComponentRegistry<PhysicsComponent>();
 	WorldSystem.AddComponentRegistry<LifetimeComponent>();
 
-	// システムを登録する
 	WorldSystem.AddSystem<PhysicsSystem>();
 	WorldSystem.AddSystem<LifetimeSystem>();
 	WorldSystem.AddSystem<ProjectileSystem>();
-
+	
+	auto count = WorldSystem.ComponentRegistryMap.count(ComponentType::Lifetime);
+	std::cout << count << std::endl;
+	
 	EntityId EntityId = WorldSystem.CreateEntity();
 	{
 		WorldSystem.AttachComponent<TransformComponent>(EntityId);

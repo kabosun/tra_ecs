@@ -32,10 +32,13 @@ class ComponentRegistry : public IComponentRegistry
 public:
 	std::vector<T> Components;
 
-	T GetComponent(const EntityId id)
+	T* GetComponent(const EntityId id)
 	{
-		// TODO
-		return T();
+		for (auto&& a : Components)
+		{
+			if (a.EntityId == id) return &a;
+		}
+		return nullptr;
 	}
 
 	virtual void CreateComponent(const EntityId id) override
