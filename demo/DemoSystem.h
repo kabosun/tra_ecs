@@ -10,6 +10,15 @@
 #include "World.h"
 #include "DemoComponent.h"
 
+namespace SystemType {
+enum SystemType
+{
+	Physics = 1,
+	Lifetime = 2,
+	Projectile = 4,
+};
+}
+
 class PhysicsSystem : public System<Requires<TransformComponent, PhysicsComponent>>
 {
 	double friction = 0.8f;
@@ -28,9 +37,12 @@ public:
 
 			physics->Velocity.X *= friction * dt;
 			physics->Velocity.Y *= friction * dt;
+			
+			std::cout << "X:" << transform->Position.X << " Y:" << transform->Position.Y << std::endl;
 		}
 	}
 };
+template<> const SystemTypeId System<Requires<TransformComponent, PhysicsComponent>>::TypeId = SystemType::Physics;
 
 class LifetimeSystem : public System<Requires<LifetimeComponent>>
 {
@@ -53,6 +65,7 @@ public:
 		}
 	}
 };
+template<> const SystemTypeId System<Requires<LifetimeComponent>>::TypeId = SystemType::Lifetime;
 
 class ProjectileSystem : public System<ProjectileSystem>
 {
@@ -72,3 +85,5 @@ public:
 		GetWorld().KillEntity(e.a.Entity);
 	}
 };
+template<> const SystemTypeId System<ProjectileSystem>::TypeId = SystemType::Projectile;
+

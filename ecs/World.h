@@ -67,6 +67,8 @@ public:
 	{
 		system.SetWorld(this);
 		system.Init();
+		
+		m_Systems[T::TypeId] = &system;
 	}
 
 	Entity& CreateEntity()

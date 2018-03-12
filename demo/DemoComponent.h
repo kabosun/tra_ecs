@@ -3,6 +3,7 @@
 #include "Entity.h"
 #include "Component.h"
 
+namespace ComponentType {
 enum ComponentType
 {
 	Transform = 1,
@@ -12,12 +13,13 @@ enum ComponentType
 	ProjectileSpawner = 16,
 	Skill = 32,
 };
+}
 
 template<typename T>
 struct Vector2
 {
-	T X;
-	T Y;
+	T X = 0;
+	T Y = 0;
 };
 using Vector2f = Vector2<double>;
 
@@ -27,7 +29,6 @@ struct TransformComponent : public Component<TransformComponent>
 	Vector2f Rotation;
 };
 template<> const ComponentTypeId Component<TransformComponent>::TypeId = ComponentType::Transform;
-
 
 struct PhysicsComponent : public Component<PhysicsComponent>
 {
@@ -52,3 +53,4 @@ struct ProjectileComponent : public Component<ProjectileComponent>
 	int current_lifetime;
 };
 template<> const ComponentTypeId Component<ProjectileComponent>::TypeId = ComponentType::Projectile;
+

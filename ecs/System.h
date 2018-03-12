@@ -13,6 +13,7 @@ class ISystem
 	std::vector<Entity> m_Entities;
 
 public:
+	
 	ISystem()
 	{}
 	
@@ -57,6 +58,8 @@ template<class Requires>
 class System : public ISystem
 {
 public:
+	static const SystemTypeId TypeId;
+	
 	System()
 		: ISystem(MakeFilter<Requires>())
 	{}

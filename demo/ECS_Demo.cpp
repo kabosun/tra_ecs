@@ -1,8 +1,8 @@
 #include "ECS_Demo.h"
 #include <iostream>
+#include "ECS.h"
 #include "DemoComponent.h"
 #include "DemoSystem.h"
-#include "ECS.h"
 
 void ECS_Demo()
 {
@@ -28,6 +28,9 @@ void ECS_Demo()
 		entity1.AddComponent<TransformComponent>();
 		entity1.AddComponent<PhysicsComponent>();
 		entity1.AddComponent<LifetimeComponent>();
+		
+		auto&& physics = entity1.GetComponent<PhysicsComponent>();
+		physics->Velocity.X = 1.5;
 	}
 
 	// world update.
