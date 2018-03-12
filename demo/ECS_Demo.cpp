@@ -1,14 +1,11 @@
-#pragma once
-
 #include "ECS_Demo.h"
 #include <iostream>
-#include "../ecs/ECS.h"
 #include "DemoComponent.h"
 #include "DemoSystem.h"
+#include "ECS.h"
 
 void ECS_Demo()
 {
-
 	World& world = World::GetInstance();
 
 	// component setup.

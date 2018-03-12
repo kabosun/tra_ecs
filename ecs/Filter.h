@@ -1,6 +1,6 @@
 #pragma once
 
-template<class... Args>
+template<typename... Args>
 struct Requires
 {
 
@@ -11,7 +11,7 @@ struct Filter
 
 };
 
-template<class Requires>
+template<typename Requires>
 Filter MakeFilter()
 {
 	return Filter();

@@ -7,6 +7,9 @@
 class IComponentStorage
 {
 public:
+	virtual ~IComponentStorage()
+	{}
+	
 	virtual void CreateComponent(const Entity entity) {}
 
 	virtual IComponent* GetComponent(const Entity entity) = 0;

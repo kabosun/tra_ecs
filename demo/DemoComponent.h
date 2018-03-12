@@ -1,6 +1,7 @@
 #pragma once
 
-#include "../ecs/Entity.h"
+#include "Entity.h"
+#include "Component.h"
 
 enum ComponentType
 {

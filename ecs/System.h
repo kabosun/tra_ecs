@@ -13,8 +13,10 @@ class ISystem
 	std::vector<Entity> m_Entities;
 
 public:
-
-	ISystem(Filter& filter)
+	ISystem()
+	{}
+	
+	ISystem(Filter filter)
 		: m_World(nullptr)
 		, m_Filter(filter)
 	{}
@@ -56,6 +58,6 @@ class System : public ISystem
 {
 public:
 	System()
-		: ISystem{ MakeFilter<Requires>() }
+		: ISystem(MakeFilter<Requires>())
 	{}
 };

@@ -7,17 +7,13 @@
 //
 
 #include <iostream>
-#include "ECS.h"
+#include "ECS_Demo.h"
 
 int main(int argc, const char * argv[]) {
 	// insert code here...
 	std::cout << "Hello, World!\n";
 	
-	std::cout << TransformComponent::COMPONENT_TYPE << std::endl;
-	std::cout << PhysicsComponent::COMPONENT_TYPE << std::endl;
-	std::cout << LifetimeComponent::COMPONENT_TYPE << std::endl;
-	
-	ECS();
+	ECS_Demo();
 	
 	return 0;
 }

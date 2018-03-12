@@ -5,9 +5,9 @@
 #include <map>
 #include <memory>
 #include <cassert>
-#include "../ecs/Event.h"
-#include "../ecs/System.h"
-#include "../ecs/World.h"
+#include "Event.h"
+#include "System.h"
+#include "World.h"
 #include "DemoComponent.h"
 
 class PhysicsSystem : public System<Requires<TransformComponent, PhysicsComponent>>
