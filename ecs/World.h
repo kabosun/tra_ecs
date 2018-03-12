@@ -21,7 +21,7 @@ class World
 	{}
 	
 public:
-	std::map<ComponentTypeId, IComponentStorage*> ComponentRegistryMap;
+	std::map<ComponentTypeId, IComponentStorage*> ComponentStorageMap;
 
 public:
 	
@@ -33,17 +33,17 @@ public:
 
 	virtual ~World()
 	{
-		for (auto pair : ComponentRegistryMap)
+		for (auto pair : ComponentStorageMap)
 		{
 			delete pair.second;
 		}
 	}
 
-	IComponentStorage* GetRegistry(ComponentTypeId type)
+	IComponentStorage* GetStorage(ComponentTypeId type)
 	{
-		assert(ComponentRegistryMap.count(type) != 0);
+		assert(ComponentStorageMap.count(type) != 0);
 		
-		return ComponentRegistryMap.at(type);
+		return ComponentStorageMap.at(type);
 	}
 
 	void KillEntity(const Entity entity)
@@ -55,11 +55,11 @@ public:
 	}
 
 	template<typename T>
-	void AddComponentRegistry()
+	void AddComponentStorage()
 	{
 		auto&& registry = new ComponentStorage<T>();
 
-		ComponentRegistryMap.insert(std::make_pair(T::TypeId, registry));
+		ComponentStorageMap.insert(std::make_pair(T::TypeId, registry));
 	}
 
 	template<typename T>
@@ -78,7 +78,7 @@ public:
 
 	void AttachComponent(const Entity& Entity, ComponentTypeId Type)
 	{
-		auto&& registry = ComponentRegistryMap.at(Type);
+		auto&& registry = ComponentStorageMap.at(Type);
 
 		assert(registry != nullptr);
 

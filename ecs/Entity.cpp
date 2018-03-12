@@ -8,7 +8,7 @@ void Entity::AddComponent(ComponentTypeId type)
 
 IComponent* Entity::GetComponent(ComponentTypeId type) const
 {
-	return World::GetInstance().GetRegistry(type)->GetComponent(*this);
+	return World::GetInstance().GetStorage(type)->GetComponent(*this);
 }
 
 void Entity::Kill()

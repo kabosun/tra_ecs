@@ -9,9 +9,9 @@ void ECS_Demo()
 	World& world = World::GetInstance();
 
 	// component setup.
-	world.AddComponentRegistry<TransformComponent>();
-	world.AddComponentRegistry<PhysicsComponent>();
-	world.AddComponentRegistry<LifetimeComponent>();
+	world.AddComponentStorage<TransformComponent>();
+	world.AddComponentStorage<PhysicsComponent>();
+	world.AddComponentStorage<LifetimeComponent>();
 
 	// system setup.
 	PhysicsSystem physicsSystem;
@@ -31,6 +31,7 @@ void ECS_Demo()
 		
 		auto&& physics = entity1.GetComponent<PhysicsComponent>();
 		physics->Velocity.X = 1.5;
+		physics->Velocity.Y = 0.5;
 	}
 
 	// world update.
