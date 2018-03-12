@@ -1,29 +1,41 @@
 #pragma once
 
-#include "Entity.h"
 #include <vector>
 #include <memory>
-
-using DeltaFrame = int;
+#include "Entity.h"
 
 class EntityRegistry
 {
 	EntityId EntityIdCoutner = 0;
+	std::vector<Entity> Entities;
 
 public:
-	std::vector<EntityId> Entities;
 
-	EntityId CreateEntity()
+	Entity& CreateEntity()
 	{
 		EntityIdCoutner++;
-		return EntityIdCoutner;
+
+		//auto e = Entity(EntityIdCoutner);
+		Entities.emplace_back(EntityIdCoutner);
+
+		return Entities.back();
+	}
+
+	void Add(const Entity& entity)
+	{
+		Entities.push_back(entity);
+	}
+
+	const std::vector<Entity> GetEntities() const
+	{
+		return Entities;
 	}
 };
 
 class IComponentRegistry
 {
 public:
-	virtual void CreateComponent(const EntityId id) {}
+	virtual void CreateComponent(const Entity entity) {}
 };
 
 template<typename T>
@@ -41,27 +53,10 @@ public:
 		return nullptr;
 	}
 
-	virtual void CreateComponent(const EntityId id) override
+	virtual void CreateComponent(const Entity entity) override
 	{
 		T c;
-		c.EntityId = id;
+		c.EntityId = entity.Id;
 		Components.push_back(c);
 	}
-};
-
-class ISystem
-{
-public:
-	virtual void Update(DeltaFrame dt) {}
-};
-
-template<typename T>
-class System : public ISystem
-{
-protected:
-	std::shared_ptr<ComponentRegistry<T>> registry;
-
-public:
-
-	virtual ~System() {}
 };

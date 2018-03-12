@@ -5,9 +5,9 @@
 #include <map>
 #include <memory>
 #include <cassert>
-#include "ECS.h"
-#include "Event.h"
-#include "World.h"
+#include "../ecs/Event.h"
+#include "../ecs/System.h"
+#include "../ecs/World.h"
 
 class PhysicsSystem : public System<PhysicsSystem>
 {
@@ -17,22 +17,14 @@ class PhysicsSystem : public System<PhysicsSystem>
 class LifetimeSystem : public System<LifetimeSystem>
 {
 public:
-	WorldSystem* WorldSystem;
-	
-	LifetimeSystem()
-	{
-		WorldSystem = &WorldSystem::GetInstance();
-	}
 
 	void Update(DeltaFrame dt) override
 	{
-		assert(WorldSystem != nullptr);
-		
-		for (LifetimeComponent& c : WorldSystem->GetRegistry<LifetimeComponent>()->Components)
+		for (LifetimeComponent& c : GetWorld()->GetRegistry<LifetimeComponent>()->Components)
 		{
 			if (c.current_lifetime >= 0)
 			{
-				WorldSystem->KillEntity(c.EntityId);
+				GetWorld()->KillEntity(c.EntityId);
 			}
 			else
 			{
@@ -45,18 +37,9 @@ public:
 class ProjectileSystem : public System<ProjectileSystem>
 {
 public:
-	WorldSystem* WorldSystem;
-
-	ProjectileSystem()
-	{
-		WorldSystem = &WorldSystem::GetInstance();
-		
-		// Add collision Callback Fuction.
-	}
 
 	void Update(DeltaFrame dt) override
 	{
-		assert(WorldSystem != nullptr);
 	}
 
 	void OnCollisionBegin(CollisionBeginEvent& e)
@@ -66,6 +49,6 @@ public:
 
 	void OnCollisionEnd(CollisionBeginEvent& e)
 	{
-		WorldSystem->KillEntity(e.a.EntityId);
+		GetWorld()->KillEntity(e.a.Entity);
 	}
 };

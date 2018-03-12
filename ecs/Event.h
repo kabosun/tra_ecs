@@ -1,13 +1,15 @@
 #pragma once
 
+#include "Entity.h"
+
 struct EntityDeadEvent
 {
-	EntityId EntityId;
+	Entity Entity;
 };
 
 struct Contact
 {
-	EntityId EntityId;
+	Entity Entity;
 };
 
 struct CollisionBeginEvent
