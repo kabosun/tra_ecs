@@ -1,9 +1,11 @@
 #pragma once
 
+#include <iostream>
 #include "EntityRegistry.h"
 #include "Event.h"
 #include "Component.h"
 #include "World.h"
+#include "System.h"
 
 void ECS()
 {
@@ -33,4 +35,6 @@ void ECS()
 	{
 		system->Update(dt);
 	}
+
+	std::cout << "ecs end." << std::endl;
 }
