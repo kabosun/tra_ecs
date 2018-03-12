@@ -6,21 +6,22 @@
 #include <memory>
 #include <cassert>
 #include "Event.h"
-#include "EntityRegistry.h"
+#include "EntityStorage.h"
+#include "ComponentStorage.h"
 #include "System.h"
 
 class World
 {
 	std::map<SystemTypeId, ISystem*> m_Systems;
 	EventHandler* EventHandler;
-	EntityRegistry m_AliveEntities;
-	EntityRegistry m_KilledEntities;
+	EntityStorage m_AliveEntities;
+	EntityStorage m_KilledEntities;
 	
 	World()
 	{}
 	
 public:
-	std::map<ComponentTypeId, IComponentRegistry*> ComponentRegistryMap;
+	std::map<ComponentTypeId, IComponentStorage*> ComponentRegistryMap;
 
 public:
 	
@@ -38,13 +39,11 @@ public:
 		}
 	}
 
-	template<typename T>
-	ComponentRegistry<T>* GetRegistry()
+	IComponentStorage* GetRegistry(ComponentTypeId type)
 	{
-		assert(ComponentRegistryMap.count(T::COMPONENT_TYPE) != 0);
+		assert(ComponentRegistryMap.count(type) != 0);
 		
-		auto&& m = ComponentRegistryMap.at(T::COMPONENT_TYPE);
-		return dynamic_cast<ComponentRegistry<T>*>(m);
+		return ComponentRegistryMap.at(type);
 	}
 
 	void KillEntity(const Entity entity)
@@ -58,13 +57,13 @@ public:
 	template<typename T>
 	void AddComponentRegistry()
 	{
-		IComponentRegistry* registry = new ComponentRegistry<T>();
+		auto&& registry = new ComponentStorage<T>();
 
-		ComponentRegistryMap.insert(std::make_pair(T::COMPONENT_TYPE, registry));
+		ComponentRegistryMap.insert(std::make_pair(T::TypeId, registry));
 	}
 
-	template<class TSystem>
-	void AddSystem(TSystem& system)
+	template<typename T>
+	void AddSystem(T& system)
 	{
 		system.SetWorld(this);
 		system.Init();
@@ -75,7 +74,7 @@ public:
 		return m_AliveEntities.CreateEntity();
 	}
 
-	void AttachComponent(Entity& Entity, ComponentTypeId Type)
+	void AttachComponent(const Entity& Entity, ComponentTypeId Type)
 	{
 		auto&& registry = ComponentRegistryMap.at(Type);
 
@@ -92,7 +91,7 @@ public:
 		{
 			for (auto&& pair : m_Systems)
 			{
-				// TODO filter
+				// TODO 登録するsystemはfilterで区別する
 				pair.second->Add(entity);
 			}
 		}

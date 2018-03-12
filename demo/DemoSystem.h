@@ -8,27 +8,47 @@
 #include "../ecs/Event.h"
 #include "../ecs/System.h"
 #include "../ecs/World.h"
+#include "DemoComponent.h"
 
-class PhysicsSystem : public System<PhysicsSystem>
+class PhysicsSystem : public System<Requires<TransformComponent, PhysicsComponent>>
 {
+	double friction = 0.8f;
 
+public:
+
+	void Update(DeltaFrame dt) override
+	{
+		for (auto& entity : GetEntities())
+		{
+			TransformComponent* transform = entity.GetComponent<TransformComponent>();
+			PhysicsComponent* physics = entity.GetComponent<PhysicsComponent>();
+
+			transform->Position.X += physics->Velocity.X;
+			transform->Position.Y += physics->Velocity.Y;
+
+			physics->Velocity.X *= friction * dt;
+			physics->Velocity.Y *= friction * dt;
+		}
+	}
 };
 
-class LifetimeSystem : public System<LifetimeSystem>
+class LifetimeSystem : public System<Requires<LifetimeComponent>>
 {
 public:
 
 	void Update(DeltaFrame dt) override
 	{
-		for (LifetimeComponent& c : GetWorld()->GetRegistry<LifetimeComponent>()->Components)
+		for (auto& entity : GetEntities())
 		{
-			if (c.current_lifetime >= 0)
+			LifetimeComponent* lifetime = entity.GetComponent<LifetimeComponent>();
+
+			if (lifetime->current_lifetime >= 0)
 			{
-				GetWorld()->KillEntity(c.EntityId);
+				GetWorld().KillEntity(entity);
 			}
 			else
 			{
-				c.current_lifetime--;
+				lifetime->current_lifetime--;
 			}
 		}
 	}
@@ -49,6 +69,6 @@ public:
 
 	void OnCollisionEnd(CollisionBeginEvent& e)
 	{
-		GetWorld()->KillEntity(e.a.Entity);
+		GetWorld().KillEntity(e.a.Entity);
 	}
 };

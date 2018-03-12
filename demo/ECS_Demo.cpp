@@ -8,7 +8,6 @@
 
 void ECS_Demo()
 {
-	//auto TransformComponents = std::shared_ptr<ComponentRegistry<TransformComponent>>();
 
 	World& world = World::GetInstance();
 
@@ -25,9 +24,6 @@ void ECS_Demo()
 	world.AddSystem(physicsSystem);
 	world.AddSystem(lifetimeSystem);
 	world.AddSystem(projectileSystem);
-
-	auto count = world.ComponentRegistryMap.count(ComponentType::Lifetime);
-	std::cout << count << std::endl;
 
 	// create entity.
 	Entity entity1 = world.CreateEntity();

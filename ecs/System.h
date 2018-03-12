@@ -2,26 +2,42 @@
 
 #include <vector>
 #include "Entity.h"
+#include "Filter.h"
 
 class World;
 
 class ISystem
 {
+	Filter m_Filter;
 	World* m_World;
 	std::vector<Entity> m_Entities;
 
 public:
+
+	ISystem(Filter& filter)
+		: m_World(nullptr)
+		, m_Filter(filter)
+	{}
+
+	virtual ~ISystem()
+	{}
+
 	virtual void Init() {}
 	virtual void Update(DeltaFrame dt) {}
+
+	const Filter& GetFilter() const
+	{
+		return m_Filter;
+	}
 
 	void SetWorld(World* world)
 	{
 		m_World = world;
 	}
 
-	World* GetWorld() const
+	World& GetWorld() const
 	{
-		return m_World;
+		return *m_World;
 	}
 
 	const std::vector<Entity>& GetEntities() const
@@ -35,13 +51,11 @@ public:
 	}
 };
 
-template<typename T>
+template<class Requires>
 class System : public ISystem
 {
-protected:
-	std::shared_ptr<ComponentRegistry<T>> registry;
-
 public:
-
-	virtual ~System() {}
+	System()
+		: ISystem{ MakeFilter<Requires>() }
+	{}
 };

@@ -1,12 +1,13 @@
 #pragma once
 
+using DeltaFrame = float;
 using EntityId = unsigned int;
-using SystemTypeId = unsigned int;
 using ComponentTypeId = unsigned int;
-using DeltaFrame = int;
+using SystemTypeId = unsigned int;
 
-class IComponent
-{};
+class World;
+class IComponent;
+class IComoponentStorage;
 
 class Entity
 {
@@ -25,24 +26,19 @@ public:
 	template<typename T>
 	void AddComponent()
 	{
-		AddComponent(*this, T::COMPONENT_TYPE);
+		AddComponent(T::TypeId);
+	}
+
+	template<typename T>
+	T* GetComponent() const
+	{
+		return static_cast<T*>(GetComponent(T::TypeId));
 	}
 
 	void Kill();
 
 private:
-	void AddComponent(Entity& entity, ComponentTypeId type);
-};
+	void AddComponent(ComponentTypeId type);
 
-template<typename T>
-class Component : public IComponent
-{
-public:
-	static const ComponentTypeId COMPONENT_TYPE;
-
-	EntityId EntityId;
-
-	Component()
-	{
-	}
+	IComponent* GetComponent(ComponentTypeId type) const;
 };
