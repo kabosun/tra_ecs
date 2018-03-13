@@ -1,11 +1,3 @@
-//
-//  main.cpp
-//  ECS
-//
-//  Created by gladius on 2018/03/09.
-//  Copyright © 2018年 gladius. All rights reserved.
-//
-
 #include <iostream>
 #include "demo2/TransformComponent.h"
 #include "demo2/LifetimeComponent.h"
