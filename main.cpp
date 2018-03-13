@@ -20,7 +20,7 @@ int main(int argc, const char * argv[]) {
 		transform.Create(e);
 		lifetime.Create(e);
 		
-		auto handle = transform.Lookup(e);
+		auto handle = transform.GetHandle(e);
 		
 		auto&& position = transform.GetPosition(handle);
 		position.X = 10;

@@ -11,9 +11,11 @@ namespace ecs2
 	{
 		static const int MAX_COMPONENT = 128;
 		
+		// 必須
 		int size = 0;
 		std::array<Entity, MAX_COMPONENT> entity;
 		
+		// ユーザー定義
 		std::array<Vector2f, MAX_COMPONENT> position;
 		std::array<Vector2f, MAX_COMPONENT> velocity;
 		std::array<Vector2f, MAX_COMPONENT> accelaration;

@@ -54,7 +54,7 @@ namespace ecs2
 			return m_Data.size;
 		}
 		
-		ComponentHandle Lookup(Entity entity)
+		ComponentHandle GetHandle(Entity entity)
 		{
 			ComponentHandle h = {m_LUTable[entity.Id]};
 			return h;
