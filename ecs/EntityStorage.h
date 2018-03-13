@@ -30,12 +30,12 @@ public:
 
 	void Remove(const Entity& entity)
 	{
-		// entityはstorageとsystemで別々のリストが管理されていてアドレスが異なる場合があるので、この処理はうまくいかない
+		/*// entityはstorageとsystemで別々のリストが管理されていてアドレスが異なる場合があるので、この処理はうまくいかない
 		size_t a = &entity;
 		size_t b = &m_Entities[0];
 		size_t index = a - b;
 		m_Entities[index] = m_Entities.back();
-		m_Entities.pop_back();
+		m_Entities.pop_back();*/
 	}
 
 	void Clear()
