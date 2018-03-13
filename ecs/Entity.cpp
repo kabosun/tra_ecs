@@ -1,9 +1,9 @@
 #include "Entity.h"
 #include "World.h"
 
-void Entity::AddComponent(ComponentTypeId type)
+void Entity::AddComponent(const Entity& entity, ComponentTypeId type)
 {
-	World::GetInstance().AttachComponent(*this, type);
+	World::GetInstance().AttachComponent(entity, type);
 }
 
 IComponent* Entity::GetComponent(ComponentTypeId type) const

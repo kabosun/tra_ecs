@@ -23,9 +23,12 @@ void ECS_Demo()
 	world.AddSystem(projectileSystem);
 
 	// create entity.
-	Entity entity1 = world.CreateEntity();
+	Entity& entity1 = world.CreateEntity();
+	std::cout << "EntityId(1):" << entity1.Id << std::endl;
 	{
 		entity1.AddComponent<TransformComponent>();
+		std::cout << "EntityId(2):" << entity1.Id << std::endl;
+
 		entity1.AddComponent<PhysicsComponent>();
 		entity1.AddComponent<LifetimeComponent>();
 		
@@ -36,6 +39,8 @@ void ECS_Demo()
 
 	// world update.
 	DeltaFrame dt = 1;
+	
+	for (int i = 0; i < 10; i++)
 	{
 		world.Refresh();
 

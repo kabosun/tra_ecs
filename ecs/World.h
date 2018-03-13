@@ -14,14 +14,14 @@ class World
 {
 	std::map<SystemTypeId, ISystem*> m_Systems;
 	EventHandler* EventHandler;
+	EntityStorage m_ActivatedEntities;
 	EntityStorage m_AliveEntities;
 	EntityStorage m_KilledEntities;
 	
+	std::map<ComponentTypeId, IComponentStorage*> ComponentStorageMap;
+
 	World()
 	{}
-	
-public:
-	std::map<ComponentTypeId, IComponentStorage*> ComponentStorageMap;
 
 public:
 	
@@ -71,11 +71,23 @@ public:
 		m_Systems[T::TypeId] = &system;
 	}
 
+	// エンティティを生成する
 	Entity& CreateEntity()
 	{
-		return m_AliveEntities.CreateEntity();
+		Entity& entity = m_AliveEntities.CreateEntity();
+
+		m_ActivatedEntities.Add(entity);
+
+		return entity;
 	}
 
+	// エンティティを削除する
+	void RemoveEntity(const Entity& entity)
+	{
+		m_AliveEntities.Remove(entity);
+	}
+
+	// エンティティにコンポーネントを登録する
 	void AttachComponent(const Entity& Entity, ComponentTypeId Type)
 	{
 		auto&& registry = ComponentStorageMap.at(Type);
@@ -89,13 +101,22 @@ public:
 	void Refresh()
 	{
 		// systemにentityを登録する
-		for (const Entity& entity : m_AliveEntities.GetEntities())
+		for (const Entity& entity : m_ActivatedEntities.GetEntities())
 		{
 			for (auto&& pair : m_Systems)
 			{
 				// TODO 登録するsystemはfilterで区別する
-				pair.second->Add(entity);
+				if (true)
+				{
+					pair.second->Add(entity);
+				}
+				else
+				{
+					pair.second->Remove(entity);
+				}
 			}
 		}
+
+		m_ActivatedEntities.Clear();
 	}
 };

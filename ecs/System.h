@@ -10,6 +10,8 @@ class ISystem
 {
 	Filter m_Filter;
 	World* m_World;
+
+	// エンティティのリスト。順番は要素削除のたびに入れ替わるので保たれない。
 	std::vector<Entity> m_Entities;
 
 public:
@@ -51,6 +53,13 @@ public:
 	void Add(const Entity& entity)
 	{
 		m_Entities.push_back(entity);
+	}
+
+	void Remove(const Entity& entity)
+	{
+		size_t index = &entity - &m_Entities[0];
+		m_Entities[index] = m_Entities.back();
+		m_Entities.pop_back();
 	}
 };
 

@@ -26,7 +26,7 @@ public:
 	template<typename T>
 	void AddComponent()
 	{
-		AddComponent(T::TypeId);
+		AddComponent(*this, T::TypeId);
 	}
 
 	template<typename T>
@@ -38,7 +38,7 @@ public:
 	void Kill();
 
 private:
-	void AddComponent(ComponentTypeId type);
+	void AddComponent(const Entity& entity, ComponentTypeId type);
 
 	IComponent* GetComponent(ComponentTypeId type) const;
 };
