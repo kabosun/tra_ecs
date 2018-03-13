@@ -37,6 +37,8 @@ public:
 
 	void Kill();
 
+	void RemoveAllComponent();
+
 private:
 	void AddComponent(const Entity& entity, ComponentTypeId type);
 

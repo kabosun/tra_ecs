@@ -35,12 +35,16 @@ void ECS_Demo()
 		auto&& physics = entity1.GetComponent<PhysicsComponent>();
 		physics->Velocity.X = 1.5;
 		physics->Velocity.Y = 0.5;
+
+		auto&& lifetime = entity1.GetComponent<LifetimeComponent>();
+		lifetime->max_lifetime = 10;
+		lifetime->current_lifetime = lifetime->max_lifetime;
 	}
 
 	// world update.
 	DeltaFrame dt = 1;
 	
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < 20; i++)
 	{
 		world.Refresh();
 

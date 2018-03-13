@@ -30,7 +30,10 @@ public:
 
 	void Remove(const Entity& entity)
 	{
-		size_t index = &entity - &m_Entities[0];
+		// entityはstorageとsystemで別々のリストが管理されていてアドレスが異なる場合があるので、この処理はうまくいかない
+		size_t a = &entity;
+		size_t b = &m_Entities[0];
+		size_t index = a - b;
 		m_Entities[index] = m_Entities.back();
 		m_Entities.pop_back();
 	}
@@ -40,7 +43,7 @@ public:
 		m_Entities.clear();
 	}
 
-	const std::vector<Entity> GetEntities() const
+	std::vector<Entity> GetEntities() const
 	{
 		return m_Entities;
 	}

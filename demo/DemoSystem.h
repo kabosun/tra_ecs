@@ -54,7 +54,7 @@ public:
 		{
 			LifetimeComponent* lifetime = entity.GetComponent<LifetimeComponent>();
 
-			if (lifetime->current_lifetime >= 0)
+			if (lifetime->current_lifetime <= 0)
 			{
 				GetWorld().KillEntity(entity);
 			}

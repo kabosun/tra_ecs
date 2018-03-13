@@ -15,3 +15,8 @@ void Entity::Kill()
 {
 	World::GetInstance().KillEntity(*this);
 }
+
+void Entity::RemoveAllComponent()
+{
+	World::GetInstance().RemoveAllComponent(*this);
+}

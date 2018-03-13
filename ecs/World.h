@@ -46,7 +46,7 @@ public:
 		return ComponentStorageMap.at(type);
 	}
 
-	void KillEntity(const Entity entity)
+	void KillEntity(const Entity& entity)
 	{
 		//EntityDeadEvent e = { entity };
 		//EventHandler->SendEvent<EntityDeadEvent>(e);
@@ -81,21 +81,23 @@ public:
 		return entity;
 	}
 
-	// エンティティを削除する
-	void RemoveEntity(const Entity& entity)
-	{
-		m_AliveEntities.Remove(entity);
-	}
-
 	// エンティティにコンポーネントを登録する
 	void AttachComponent(const Entity& Entity, ComponentTypeId Type)
 	{
-		auto&& registry = ComponentStorageMap.at(Type);
+		auto&& storage = ComponentStorageMap.at(Type);
 
-		assert(registry != nullptr);
+		assert(storage != nullptr);
 
-		registry->CreateComponent(Entity);
+		storage->CreateComponent(Entity);
 		
+	}
+
+	void RemoveAllComponent(const Entity& Entity)
+	{
+		for (auto pair : ComponentStorageMap)
+		{
+			pair.second->RemoveComponent(Entity);
+		}
 	}
 
 	void Refresh()
@@ -115,6 +117,16 @@ public:
 					pair.second->Remove(entity);
 				}
 			}
+		}
+
+		for (auto&& entity : m_KilledEntities.GetEntities())
+		{
+			entity.RemoveAllComponent();
+
+			// エンティティを削除する
+			m_AliveEntities.Remove(entity);
+
+			std::cout << "RemoveEntity:" << entity.Id << std::endl;
 		}
 
 		m_ActivatedEntities.Clear();
