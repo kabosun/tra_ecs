@@ -3,29 +3,26 @@
 
 namespace ecs2
 {
-	void PhysicsComponentStorage::Update(EntityRegistry& registry, float dt)
+	void PhysicsComponentSystem::Update(EntityRegistry& registry, float dt)
 	{
-		assert(m_TransformComponentStorage != nullptr);
+		assert(m_TransformComponentSystem != nullptr);
 
 		for (int i = 0; i<m_Data.Size; i++)
 		{
-			auto handle = m_TransformComponentStorage->GetHandle(m_Data.Entity[i]);
-			Vector2f& position = m_TransformComponentStorage->GetPosition(handle);
+			auto handle = m_TransformComponentSystem->GetHandle(m_Data.Entity[i]);
+			Vector3f& position = m_TransformComponentSystem->GetPosition(handle);
 
-			Vector2f& velocity = m_Data.Velocity[i];
-			Vector2f& accelaration = m_Data.Accelaration[i];
+			Vector3f& velocity = m_Data.Velocity[i];
+			Vector3f& accelaration = m_Data.Acceleration[i];
 
-			velocity.X += accelaration.X * dt;
-			velocity.Y += accelaration.Y * dt;
-
-			position.X += velocity.X * dt;
-			position.Y += velocity.Y * dt;
+			velocity += accelaration * dt;
+			position += velocity * dt;
 		}
 	}
 
-	void PhysicsComponentStorage::OnCreateEntity(Entity entity)
+	void PhysicsComponentSystem::OnCreateEntity(Entity entity)
 	{}
 
-	void PhysicsComponentStorage::OnRemoveEntity(Entity entity)
+	void PhysicsComponentSystem::OnRemoveEntity(Entity entity)
 	{}
 }

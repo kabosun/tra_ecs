@@ -2,7 +2,7 @@
 
 #include <array>
 #include "../ecs2/Entity.h"
-#include "../ecs2/ComponentStorage.h"
+#include "../ecs2/ComponentSystem.h"
 #include <iostream>
 
 namespace ecs2
@@ -21,15 +21,15 @@ namespace ecs2
 	};
 	
 	
-	class ExplodeComponentStorage : public ComponentStorage<ExplodeComponent>, public IEntityEventListener
+	class ExplodeComponentSystem : public ComponentSystem<ExplodeComponent>, public IEntityEventListener
 	{
-		class TransformComponentStorage* m_TransformComponentStorage = nullptr;
+		class TransformComponentSystem* m_TransformComponentSystem = nullptr;
 
 	public:
 
-		void Depends(TransformComponentStorage* s)
+		void Depends(TransformComponentSystem* s)
 		{
-			m_TransformComponentStorage = s;
+			m_TransformComponentSystem = s;
 		}
 
 		int GetExplodePerticileId(ComponentHandle handle)

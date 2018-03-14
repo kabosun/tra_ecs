@@ -2,7 +2,7 @@
 
 #include <array>
 #include "../ecs2/Entity.h"
-#include "../ecs2/ComponentStorage.h"
+#include "../ecs2/ComponentSystem.h"
 
 namespace ecs2
 {
@@ -21,7 +21,7 @@ namespace ecs2
 		std::array<Health, MAX_COMPONENT> Health;
 	};
 	
-	class HealthComponentStorage : public ComponentStorage<HealthComponent>, public IUpdatable
+	class HealthComponentSystem : public ComponentSystem<HealthComponent>, public IUpdatable
 	{
 	public:
 		Health& GetHealth(ComponentHandle handle)

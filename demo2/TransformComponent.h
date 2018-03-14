@@ -2,7 +2,7 @@
 
 #include <array>
 #include "../ecs2/Entity.h"
-#include "../ecs2/ComponentStorage.h"
+#include "../ecs2/ComponentSystem.h"
 
 namespace ecs2
 {
@@ -16,28 +16,40 @@ namespace ecs2
 		std::array<Entity, MAX_COMPONENT> Entity;
 		
 		// ユーザー定義
-		std::array<Vector2f, MAX_COMPONENT> Position;
+		std::array<Vector3f, MAX_COMPONENT> Position;
+		std::array<float, MAX_COMPONENT> Rotation;
+		std::array<Vector3f, MAX_COMPONENT> Scale;
 	};
 	
 	
-	class TransformComponentStorage : public ComponentStorage<TransformComponent>
+	class TransformComponentSystem : public ComponentSystem<TransformComponent>
 	{
 	public:
-		Vector2f& GetPosition(ComponentHandle handle)
+		Vector3f& GetPosition(ComponentHandle handle)
 		{
 			return m_Data.Position[handle.index];
+		}
+
+		float& GetRotation(ComponentHandle handle)
+		{
+			return m_Data.Rotation[handle.index];
+		}
+
+		Vector3f& GetScale(ComponentHandle handle)
+		{
+			return m_Data.Scale[handle.index];
 		}
 		
 	protected:
 		void Reset(int index) override
 		{
-			m_Data.Position[index].X = 0;
-			m_Data.Position[index].Y = 0;
 		}
 		
 		void Compact(int index, int lastIndex) override
 		{
 			m_Data.Position[index] = m_Data.Position[lastIndex];
+			m_Data.Rotation[index] = m_Data.Rotation[lastIndex];
+			m_Data.Scale[index] = m_Data.Scale[lastIndex];
 		}
 	};
 

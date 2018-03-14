@@ -2,7 +2,7 @@
 
 #include <array>
 #include "../ecs2/Entity.h"
-#include "../ecs2/ComponentStorage.h"
+#include "../ecs2/ComponentSystem.h"
 #include <iostream>
 
 namespace ecs2
@@ -17,30 +17,30 @@ namespace ecs2
 		std::array<Entity, MAX_COMPONENT> Entity;
 		
 		// ユーザー定義
-		std::array<Vector2f, MAX_COMPONENT> Velocity;
-		std::array<Vector2f, MAX_COMPONENT> Accelaration;
+		std::array<Vector3f, MAX_COMPONENT> Velocity;
+		std::array<Vector3f, MAX_COMPONENT> Acceleration;
 	};
 	
 	
-	class PhysicsComponentStorage : public ComponentStorage<PhysicsComponent>, public IUpdatable, public IEntityEventListener
+	class PhysicsComponentSystem : public ComponentSystem<PhysicsComponent>, public IUpdatable, public IEntityEventListener
 	{
-		class TransformComponentStorage* m_TransformComponentStorage = nullptr;
+		class TransformComponentSystem* m_TransformComponentSystem = nullptr;
 
 	public:
 
-		void Depends(TransformComponentStorage* s)
+		void Depends(TransformComponentSystem* s)
 		{
-			m_TransformComponentStorage = s;
+			m_TransformComponentSystem = s;
 		}
 
-		Vector2f& GetVelocity(ComponentHandle handle)
+		Vector3f& GetVelocity(ComponentHandle handle)
 		{
 			return m_Data.Velocity[handle.index];
 		}
 
-		Vector2f& GetAccelaration(ComponentHandle handle)
+		Vector3f& GetAccelaration(ComponentHandle handle)
 		{
-			return m_Data.Accelaration[handle.index];
+			return m_Data.Acceleration[handle.index];
 		}
 
 		void Update(EntityRegistry& registry, float dt) override;
@@ -52,16 +52,12 @@ namespace ecs2
 	protected:
 		void Reset(int index) override
 		{
-			m_Data.Velocity[index].X = 0;
-			m_Data.Velocity[index].Y = 0;
-			m_Data.Accelaration[index].X = 0;
-			m_Data.Accelaration[index].Y = 0;
 		}
 		
 		void Compact(int index, int lastIndex) override
 		{
 			m_Data.Velocity[index] = m_Data.Velocity[lastIndex];
-			m_Data.Accelaration[index] = m_Data.Accelaration[lastIndex];
+			m_Data.Acceleration[index] = m_Data.Acceleration[lastIndex];
 		}
 	};
 

@@ -17,16 +17,98 @@ namespace ecs2
 	}
 	
 	template<typename T>
-	struct Vector2
+	struct Vector3
 	{
 		T X;
 		T Y;
+		T Z;
 		
-		Vector2()
-		: X(0), Y(0)
+		Vector3()
+		: X(0), Y(0), Z(0)
 		{}
+
+		Vector3<T>& operator=(const Vector3<T>& v)
+		{
+			X = v.X;
+			Y = v.Y;
+			Z = v.Z;
+
+			return *this;
+		}
+
+		Vector3<T>& operator+=(const Vector3<T>& v)
+		{
+			X += v.X;
+			Y += v.Y;
+			Z += v.Z;
+
+			return *this;
+		}
+
+		Vector3<T>& operator-=(const Vector3<T>& v)
+		{
+			X -= v.X;
+			Y -= v.Y;
+			Z -= v.Z;
+
+			return *this;
+		}
+
+		Vector3<T>& operator-=(const T v)
+		{
+			X *= v;
+			Y *= v;
+			Z *= v;
+
+			return *this;
+		}
 	};
-	using Vector2f = Vector2<float>;
+
+	template<typename T>
+	Vector3<T> operator+(const Vector3<T>& u, const Vector3<T>& v)
+	{
+		Vector3<T> t;
+		t.X = u.X + v.X;
+		t.Y = u.Y + v.Y;
+		t.Z = u.Z + v.Z;
+
+		return t;
+	}
+
+	template<typename T>
+	Vector3<T>& operator-(const Vector3<T>& u, const Vector3<T>& v)
+	{
+		Vector3<T> t;
+		t.X = u.X - v.X;
+		t.Y = u.Y - v.Y;
+		t.Z = u.Z - v.Z;
+
+		return t;
+	}
+
+	template<typename T>
+	Vector3<T>& operator*(const T u, const Vector3<T>& v)
+	{
+		Vector3<T> t;
+		t.X = v.X * u;
+		t.Y = v.Y * u;
+		t.Z = v.Z * u;
+
+		return t;
+	}
+
+	template<typename T>
+	Vector3<T>& operator*(const Vector3<T>& v, const T u)
+	{
+		Vector3<T> t;
+		t.X = v.X * u;
+		t.Y = v.Y * u;
+		t.Z = v.Z * u;
+
+		return t;
+	}
+
+	using Vector3f = Vector3<float>;
 
 	template<typename T>
 	struct MaxValue
@@ -55,7 +137,7 @@ namespace ecs2
 	};
 	
 	template<typename T>
-	class ComponentStorage : public IGarbageCollectable
+	class ComponentSystem : public IGarbageCollectable
 	{
 	protected:
 		T m_Data;
@@ -68,6 +150,9 @@ namespace ecs2
 		virtual void Compact(int index, int lastIndex) = 0;
 		
 	public:
+
+		virtual ~ ComponentSystem()
+		{}
 		
 		int Size() const
 		{
@@ -80,7 +165,7 @@ namespace ecs2
 			return h;
 		}
 		
-		int Create(Entity entity)
+		ComponentHandle Create(Entity entity)
 		{
 			if (m_LUTable.count(entity.Id) == 0)
 			{
@@ -89,13 +174,16 @@ namespace ecs2
 				m_LUTable[entity.Id] = n;
 				++m_Data.Size;
 				Reset(n);
-				return n;
+
+				ComponentHandle h = { n };
+				return h;
 			}
 			else
 			{
 				auto n = m_LUTable[entity.Id];
 				Reset(n);
-				return n;
+				ComponentHandle h = { m_LUTable[entity.Id] };
+				return h;
 			}
 		}
 		
