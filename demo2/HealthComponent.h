@@ -6,10 +6,10 @@
 
 namespace ecs2
 {
-	using Lifetime = MaxValue<int>;
-	
+	using Health = MaxValue<int>;
+
 	// コンポーネント
-	struct LifetimeComponent
+	struct HealthComponent
 	{
 		static const int MAX_COMPONENT = 128;
 		
@@ -18,30 +18,26 @@ namespace ecs2
 		std::array<Entity, MAX_COMPONENT> Entity;
 		
 		// ユーザー定義
-		std::array<Lifetime, MAX_COMPONENT> Lifetime;
+		std::array<Health, MAX_COMPONENT> Health;
 	};
 	
-	class LifetimeComponentStorage : public ComponentStorage<LifetimeComponent>, public IUpdatable
+	class HealthComponentStorage : public ComponentStorage<HealthComponent>, public IUpdatable
 	{
 	public:
-		Lifetime& GetLifetime(ComponentHandle handle)
+		Health& GetHealth(ComponentHandle handle)
 		{
-			return m_Data.Lifetime[handle.index];
+			return m_Data.Health[handle.index];
 		}
 		
 		void Update(EntityRegistry& registry, float dt) override
 		{
 			for (int i=0; i<m_Data.Size; i++)
 			{
-				Lifetime& lifetime = m_Data.Lifetime[i];
-				if (lifetime.Current <= 0)
+				Health& health = m_Data.Health[i];
+				if (health.Current <= 0)
 				{
 					// Destory Entity
 					registry.Remove(m_Data.Entity[i]);
-				}
-				else
-				{
-					lifetime.Current -= dt;
 				}
 			}
 		}
@@ -49,13 +45,13 @@ namespace ecs2
 	protected:
 		void Reset(int index) override
 		{
-			m_Data.Lifetime[index].Current = 10;
-			m_Data.Lifetime[index].Max = 10;
+			m_Data.Health[index].Current = 10;
+			m_Data.Health[index].Max = 10;
 		}
 		
 		void Compact(int index, int lastIndex) override
 		{
-			m_Data.Lifetime[index] = m_Data.Lifetime[lastIndex];
+			m_Data.Health[index] = m_Data.Health[lastIndex];
 		}
 	};
 	

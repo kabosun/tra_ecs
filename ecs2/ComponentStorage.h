@@ -8,10 +8,10 @@
 
 namespace ecs2
 {
-	std::random_device rand;
-	std::mt19937 mt;
+	static std::random_device rand;
+	static std::mt19937 mt;
 	
-	void Initialize()
+	static void Initialize()
 	{
 		mt.seed(rand());
 	}
@@ -27,15 +27,35 @@ namespace ecs2
 		{}
 	};
 	using Vector2f = Vector2<float>;
+
+	template<typename T>
+	struct MaxValue
+	{
+		float Current;
+		float Max;
+	};
+
 	
 	// lookup
 	struct ComponentHandle
 	{
 		int index;
 	};
+
+	class IUpdatable
+	{
+	public:
+		virtual void Update(EntityRegistry& registry, float dt) = 0;
+	};
+
+	class IGarbageCollectable
+	{
+	public:
+		virtual void GC(EntityRegistry& registry) = 0;
+	};
 	
 	template<typename T>
-	class ComponentStorage
+	class ComponentStorage : public IGarbageCollectable
 	{
 	protected:
 		T m_Data;
@@ -51,7 +71,7 @@ namespace ecs2
 		
 		int Size() const
 		{
-			return m_Data.size;
+			return m_Data.Size;
 		}
 		
 		ComponentHandle GetHandle(Entity entity)
@@ -64,10 +84,10 @@ namespace ecs2
 		{
 			if (m_LUTable.count(entity.Id) == 0)
 			{
-				auto n = m_Data.size;
-				m_Data.entity[n] = entity;
+				auto n = m_Data.Size;
+				m_Data.Entity[n] = entity;
 				m_LUTable[entity.Id] = n;
-				++m_Data.size;
+				++m_Data.Size;
 				Reset(n);
 				return n;
 			}
@@ -79,32 +99,30 @@ namespace ecs2
 			}
 		}
 		
-		void Destroy(int index)
+		void Remove(int index)
 		{
-			int lastIndex = m_Data.size - 1;
-			Entity entity = m_Data.entity[index];
-			Entity lastEntity = m_Data.entity[lastIndex];
+			int lastIndex = m_Data.Size - 1;
+			Entity entity = m_Data.Entity[index];
+			Entity lastEntity = m_Data.Entity[lastIndex];
 			
 			// 削除したentityの位置に最後のコンポーネントをコピーする
-			m_Data.entity[index] = m_Data.entity[lastIndex];
+			m_Data.Entity[index] = m_Data.Entity[lastIndex];
 			Compact(index, lastIndex);
 			
 			m_LUTable[lastEntity.Id] = index;
 			m_LUTable.erase(entity.Id);
 			
-			--m_Data.size;
+			--m_Data.Size;
 		}
-		
-		virtual void Update(EntityRegistry& registry, float dt) = 0;
 		
 		void GC(EntityRegistry& registry)
 		{
 			int alive_in_row = 0;
 			
-			while (m_Data.size > 0 && alive_in_row < 4)
+			while (m_Data.Size > 0 && alive_in_row < 4)
 			{
-				int n = mt() % m_Data.size;
-				if (registry.Alive(m_Data.entity[n]))
+				int n = mt() % m_Data.Size;
+				if (registry.Alive(m_Data.Entity[n]))
 				{
 					++alive_in_row;
 					continue;
@@ -113,7 +131,7 @@ namespace ecs2
 				alive_in_row = 0;
 				
 				// entityが死んでいたらコンポーネントも削除する
-				Destroy(n);
+				Remove(n);
 			}
 		}
 	};
