@@ -11,11 +11,6 @@ namespace ecs2
 	static std::random_device rand;
 	static std::mt19937 mt;
 	
-	static void Initialize()
-	{
-		mt.seed(rand());
-	}
-	
 	template<typename T>
 	struct Vector3
 	{
@@ -76,7 +71,7 @@ namespace ecs2
 	}
 
 	template<typename T>
-	Vector3<T>& operator-(const Vector3<T>& u, const Vector3<T>& v)
+	Vector3<T> operator-(const Vector3<T>& u, const Vector3<T>& v)
 	{
 		Vector3<T> t;
 		t.X = u.X - v.X;
@@ -87,7 +82,7 @@ namespace ecs2
 	}
 
 	template<typename T>
-	Vector3<T>& operator*(const T u, const Vector3<T>& v)
+	Vector3<T> operator*(const T u, const Vector3<T>& v)
 	{
 		Vector3<T> t;
 		t.X = v.X * u;
@@ -98,7 +93,7 @@ namespace ecs2
 	}
 
 	template<typename T>
-	Vector3<T>& operator*(const Vector3<T>& v, const T u)
+	Vector3<T> operator*(const Vector3<T>& v, const T u)
 	{
 		Vector3<T> t;
 		t.X = v.X * u;
@@ -127,15 +122,16 @@ namespace ecs2
 	class IUpdatable
 	{
 	public:
-		virtual void Update(EntityRegistry& registry, float dt) = 0;
+		virtual void Update(EntityRegistry* eRgistry, float dt) = 0;
 	};
 
 	class IGarbageCollectable
 	{
 	public:
-		virtual void GC(EntityRegistry& registry) = 0;
+		virtual void GC(EntityRegistry* registry) = 0;
 	};
 	
+	class ComponentSystemRegistry;
 	template<typename T>
 	class ComponentSystem : public IGarbageCollectable
 	{
@@ -150,6 +146,7 @@ namespace ecs2
 		virtual void Compact(int index, int lastIndex) = 0;
 		
 	public:
+		ComponentSystemRegistry* m_CSRegistry;
 
 		virtual ~ ComponentSystem()
 		{}
@@ -203,14 +200,14 @@ namespace ecs2
 			--m_Data.Size;
 		}
 		
-		void GC(EntityRegistry& registry)
+		void GC(EntityRegistry* registry) override
 		{
 			int alive_in_row = 0;
 			
 			while (m_Data.Size > 0 && alive_in_row < 4)
 			{
 				int n = mt() % m_Data.Size;
-				if (registry.Alive(m_Data.Entity[n]))
+				if (registry->Alive(m_Data.Entity[n]))
 				{
 					++alive_in_row;
 					continue;

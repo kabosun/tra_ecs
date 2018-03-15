@@ -29,7 +29,7 @@ namespace ecs2
 			return m_Data.Health[handle.index];
 		}
 		
-		void Update(EntityRegistry& registry, float dt) override
+		void Update(EntityRegistry* eRegistry, float dt) override
 		{
 			for (int i=0; i<m_Data.Size; i++)
 			{
@@ -37,7 +37,7 @@ namespace ecs2
 				if (health.Current <= 0)
 				{
 					// Destory Entity
-					registry.Remove(m_Data.Entity[i]);
+					eRegistry->Remove(m_Data.Entity[i]);
 				}
 			}
 		}

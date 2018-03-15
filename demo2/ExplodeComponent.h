@@ -27,11 +27,6 @@ namespace ecs2
 
 	public:
 
-		void Depends(TransformComponentSystem* s)
-		{
-			m_TransformComponentSystem = s;
-		}
-
 		int GetExplodePerticileId(ComponentHandle handle)
 		{
 			return m_Data.ExplodePerticileId[handle.index];

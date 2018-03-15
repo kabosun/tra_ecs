@@ -24,14 +24,7 @@ namespace ecs2
 	
 	class PhysicsComponentSystem : public ComponentSystem<PhysicsComponent>, public IUpdatable, public IEntityEventListener
 	{
-		class TransformComponentSystem* m_TransformComponentSystem = nullptr;
-
 	public:
-
-		void Depends(TransformComponentSystem* s)
-		{
-			m_TransformComponentSystem = s;
-		}
 
 		Vector3f& GetVelocity(ComponentHandle handle)
 		{
@@ -43,7 +36,7 @@ namespace ecs2
 			return m_Data.Acceleration[handle.index];
 		}
 
-		void Update(EntityRegistry& registry, float dt) override;
+		void Update(EntityRegistry* eRgistry, float dt) override;
 
 		void OnCreateEntity(Entity entity) override;
 

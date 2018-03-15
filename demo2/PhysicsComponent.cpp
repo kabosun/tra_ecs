@@ -1,10 +1,13 @@
 #include "PhysicsComponent.h"
 #include "TransformComponent.h"
+#include "ComponentSystemRegistry.h"
+#include <cassert>
 
 namespace ecs2
 {
-	void PhysicsComponentSystem::Update(EntityRegistry& registry, float dt)
+	void PhysicsComponentSystem::Update(EntityRegistry* eRegistry, float dt)
 	{
+		auto m_TransformComponentSystem = this->m_CSRegistry->Get<TransformComponentSystem>();
 		assert(m_TransformComponentSystem != nullptr);
 
 		for (int i = 0; i<m_Data.Size; i++)

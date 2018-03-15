@@ -22,7 +22,7 @@ namespace ecs2
 	};
 	
 	
-	class TransformComponentSystem : public ComponentSystem<TransformComponent>
+	class TransformComponentSystem : public ComponentSystem<TransformComponent>, public IEntityEventListener
 	{
 	public:
 		Vector3f& GetPosition(ComponentHandle handle)
@@ -39,6 +39,12 @@ namespace ecs2
 		{
 			return m_Data.Scale[handle.index];
 		}
+		
+		void OnCreateEntity(Entity entity) override
+		{}
+		
+		void OnRemoveEntity(Entity entity) override
+		{}
 		
 	protected:
 		void Reset(int index) override
