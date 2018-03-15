@@ -155,6 +155,11 @@ namespace ecs2
 		{
 			return m_Data.Size;
 		}
+
+		Entity GetEntity(int index) const
+		{
+			return m_Data.Entity[index];
+		}
 		
 		ComponentHandle GetHandle(Entity entity)
 		{

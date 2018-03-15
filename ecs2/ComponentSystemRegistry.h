@@ -21,6 +21,11 @@ namespace ecs2
 		{
 			m_EntityRegistry = registry;
 		}
+
+		std::shared_ptr<EntityRegistry> GetEntityRegistry()
+		{
+			return m_EntityRegistry;
+		}
 		
 		template<typename T>
 		std::shared_ptr<T> Add()

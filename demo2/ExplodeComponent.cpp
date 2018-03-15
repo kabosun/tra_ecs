@@ -1,6 +1,6 @@
 #include "ExplodeComponent.h"
 #include "TransformComponent.h"
-#include "ComponentSystemRegistry.h"
+#include "../ecs2/ComponentSystemRegistry.h"
 #include <iostream>
 
 namespace ecs2
@@ -16,6 +16,6 @@ namespace ecs2
 		auto& position = m_TransformComponentSystem->GetPosition(handle);
 
 		// entityがなくなったら爆発エフェクトを発生させる
-		std::cout << "Emit Explode Perticle. ID:" << entity.Index() << "(" << entity.Generation() << ") X:" << position.X << " Y:" << position.Y << std::endl;
+		std::cout << "Emit Explode Perticle. ID:" << entity.Index() << "(" << entity.Generation() << ") X:" << position.X << " Y:" << position.Y << " Z:" << position.Z << std::endl;
 	}
 }

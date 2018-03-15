@@ -1,19 +1,17 @@
 #include "PhysicsComponent.h"
 #include "TransformComponent.h"
-#include "ComponentSystemRegistry.h"
-#include <cassert>
+#include "../ecs2/ComponentSystemRegistry.h"
 
 namespace ecs2
 {
 	void PhysicsComponentSystem::Update(EntityRegistry* eRegistry, float dt)
 	{
-		auto m_TransformComponentSystem = this->m_CSRegistry->Get<TransformComponentSystem>();
-		assert(m_TransformComponentSystem != nullptr);
+		auto transformComponentSystem = this->m_CSRegistry->Get<TransformComponentSystem>();
 
 		for (int i = 0; i<m_Data.Size; i++)
 		{
-			auto handle = m_TransformComponentSystem->GetHandle(m_Data.Entity[i]);
-			Vector3f& position = m_TransformComponentSystem->GetPosition(handle);
+			auto handle = transformComponentSystem->GetHandle(m_Data.Entity[i]);
+			Vector3f& position = transformComponentSystem->GetPosition(handle);
 
 			Vector3f& velocity = m_Data.Velocity[i];
 			Vector3f& accelaration = m_Data.Acceleration[i];

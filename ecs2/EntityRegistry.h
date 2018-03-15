@@ -3,6 +3,7 @@
 #include <vector>
 #include <deque>
 #include <iostream>
+#include <memory>
 #include "Entity.h"
 
 namespace ecs2
@@ -20,16 +21,17 @@ namespace ecs2
 	class EntityEvent
 	{
 		std::vector<IEntityEventListener*> m_EventListener;
+
 	public:
 
-		void AddListener(IEntityEventListener* listener)
+		void AddEventListener(IEntityEventListener* listener)
 		{
 			m_EventListener.push_back(listener);
 		}
 
 		void RemoveListener(IEntityEventListener* listener)
 		{
-			//m_EventListener.erase();
+			// TODO
 		}
 
 		void SendCreateEntityEvent(Entity e)
