@@ -64,10 +64,11 @@ namespace ecs2
 		}
 	};
 
-	class PhysicsFacade
+	class PhysicsFacade final
 	{
 		PhysicsComponentSystem* component;
 		Entity entity;
+
 	public:
 		static PhysicsFacade Create(Entity entity, PhysicsComponentSystem* component)
 		{

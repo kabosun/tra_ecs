@@ -21,10 +21,10 @@ namespace ecs2
 		std::array<Vector3f, MAX_COMPONENT> Scale;
 	};
 	
-	
 	class TransformComponentSystem : public ComponentSystem<TransformComponent>, public IEntityEventListener
 	{
 	public:
+
 		Vector3f GetPosition(ComponentHandle handle) const
 		{
 			return m_Data.Position[handle.index];
@@ -74,30 +74,27 @@ namespace ecs2
 		}
 	};
 
-	class TransformFacade
+	class TransformFacade final
 	{
 		TransformComponentSystem* component;
-		Entity entity;
 		ComponentHandle handle;
+
 	public:
-		static TransformFacade Create(Entity entity, TransformComponentSystem* component)
+		TransformFacade(Entity entity, TransformComponentSystem* component)
 		{
-			TransformFacade facade;
-			facade.entity = entity;
-			facade.component = component;
-			facade.handle = component->GetHandle(entity);
-			
-			return facade;
+			this->component = component;
+			this->handle = component->GetHandle(entity);
 		}
-		
+
 		Vector3f GetPosition() const
 		{
 			return component->GetPosition(handle);
 		}
-		
-		void SetPosition(const Vector3f& position)
+
+		TransformFacade& SetPosition(const Vector3f& position)
 		{
 			component->SetPosition(handle, position);
+			return *this;
 		}
 
 		float GetRotation() const
@@ -105,9 +102,10 @@ namespace ecs2
 			return component->GetRotation(handle);
 		}
 
-		void SetRotation(float rotation)
+		TransformFacade& SetRotation(float rotation)
 		{
 			component->SetRotation(handle, rotation);
+			return *this;
 		}
 
 		Vector3f GetScale() const
@@ -115,9 +113,10 @@ namespace ecs2
 			return component->GetScale(handle);
 		}
 
-		void SetScale(const Vector3f& scale)
+		TransformFacade& SetScale(const Vector3f& scale)
 		{
 			component->SetScale(handle, scale);
+			return *this;
 		}
 	};
 }

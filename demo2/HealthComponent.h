@@ -59,31 +59,28 @@ namespace ecs2
 			m_Data.Health[index] = m_Data.Health[lastIndex];
 		}
 	};
-	
-	class HealthFacade
+
+	class HealthFacade final
 	{
 		HealthComponentSystem* component;
-		Entity entity;
+		ComponentHandle handle;
+
 	public:
-		static HealthFacade Create(Entity entity, HealthComponentSystem* component)
+		HealthFacade(Entity entity, HealthComponentSystem* component)
 		{
-			HealthFacade facade;
-			facade.entity = entity;
-			facade.component = component;
-			
-			return facade;
+			this->component = component;
+			this->handle = component->GetHandle(entity);
 		}
-		
+
 		Health GetHealth() const
 		{
-			ComponentHandle handle = component->GetHandle(entity);
 			return component->GetHealth(handle);
 		}
-		
-		void SetHealth(const Health& health)
+
+		HealthFacade& SetHealth(const Health& health)
 		{
-			ComponentHandle handle = component->GetHandle(entity);
 			component->SetHealth(handle, health);
+			return *this;
 		}
 	};
 }
