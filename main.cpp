@@ -4,6 +4,83 @@
 
 using namespace ecs2;
 
+enum ComponentType
+{
+	TRANSFORM = 1,
+	PHYSICS = 2,
+	LIFETIME = 4,
+	HEALTH = 8,
+	EXPLODE = 16,
+	ALL = 31,
+};
+
+class EntityFacade
+{
+	Entity entity;
+	ComponentSystemRegistry* componentSystemRegistry;
+	
+	TransformFacade transformFacade;
+	PhysicsFacade physicsFacade;
+	HealthFacade healthFacade;
+	
+public:
+	EntityFacade(ComponentSystemRegistry* componentSystemRegistry, Entity entity)
+	{
+		this->entity = entity;
+		this->componentSystemRegistry = componentSystemRegistry;
+	}
+	
+	virtual ~EntityFacade()
+	{}
+	
+	void CreateComponent(int componentType)
+	{
+		if ((componentType & ComponentType::TRANSFORM) > 0)
+		{
+			auto&& component = componentSystemRegistry->Get<TransformComponentSystem>();
+			component->Create(entity);
+			transformFacade = TransformFacade::Create(entity, component.get());
+		}
+		if ((componentType & ComponentType::PHYSICS) > 0)
+		{
+			auto&& component = componentSystemRegistry->Get<PhysicsComponentSystem>();
+			component->Create(entity);
+			physicsFacade = PhysicsFacade::Create(entity, component.get());
+		}
+		if ((componentType & ComponentType::LIFETIME) > 0)
+		{
+			auto&& component = componentSystemRegistry->Get<LifetimeComponentSystem>();
+			component->Create(entity);
+		}
+		if ((componentType & ComponentType::HEALTH) > 0)
+		{
+			auto&& component = componentSystemRegistry->Get<HealthComponentSystem>();
+			component->Create(entity);
+			healthFacade = HealthFacade::Create(entity, component.get());
+		}
+		if ((componentType & ComponentType::EXPLODE) > 0)
+		{
+			auto&& component = componentSystemRegistry->Get<ExplodeComponentSystem>();
+			component->Create(entity);
+		}
+	}
+	
+	TransformFacade& Transform()
+	{
+		return transformFacade;
+	}
+	
+	PhysicsFacade& Physics()
+	{
+		return physicsFacade;
+	}
+	
+	HealthFacade& Health()
+	{
+		return healthFacade;
+	}
+};
+
 int main(int argc, const char * argv[]) {
 	
 	ecs2::mt.seed(ecs2::rand());
@@ -25,42 +102,31 @@ int main(int argc, const char * argv[]) {
 	auto explodeComponent = componentSystemRegistry.Get<ExplodeComponentSystem>();
 	
 	// event
-	registry->AddListener(explodeComponent.get());
+	registry->AddEventListener(explodeComponent.get());
 
 	
 	float dt = 1.0f;
 	for (int i=0; i<128; i++)
 	{
 		std::cout << "Frame:" << i << std::endl;
-
-		Entity e = registry->Create();
-		transformComponent->Create(e);
-		physicsComponent->Create(e);
-		lifetimeComponent->Create(e);
-		healthComponent->Create(e);
-		explodeComponent->Create(e);
 		
-		// transform
-		auto transformHandle = transformComponent->GetHandle(e);
-		
-		auto&& position = transformComponent->GetPosition(transformHandle);
-		position.X = 10;
-		position.Y = 20;
-		position.Z = 0;
-		
-		auto&& velocity = physicsComponent->GetVelocity(transformHandle);
-		velocity.X = 5.0;
-		velocity.Y = 3.5;
-		velocity.Z = 0.0;
-
-		// health
-		auto healthHandle = healthComponent->GetHandle(e);
-		auto&& health = healthComponent->GetHealth(healthHandle);
-		health.Max = 100;
-		health.Current = 100;
-
-		std::cout << "Create ID:" << e.Index() << " (" << e.Generation() << ") X:" << position.X << " Y:" << position.Y << std::endl;
-		
+		{
+			Entity e = registry->Create();
+			EntityFacade entity = EntityFacade(&componentSystemRegistry, e);
+			
+			entity.CreateComponent(ComponentType::ALL);
+			
+			Vector3f position(10, 20, 0);
+			entity.Transform().SetPosition(position);
+			
+			Vector3f velocity(5, 3.5, 0);
+			entity.Physics().SetVelocity(velocity);
+			
+			Health health(100, 100);
+			entity.Health().SetHealth(health);
+			
+			std::cout << "Create ID:" << e.Index() << " (" << e.Generation() << ") X:" << position.X << " Y:" << position.Y << std::endl;
+		}
 		
 		componentSystemRegistry.Update(dt);
 		

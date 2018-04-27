@@ -25,19 +25,34 @@ namespace ecs2
 	class TransformComponentSystem : public ComponentSystem<TransformComponent>, public IEntityEventListener
 	{
 	public:
-		Vector3f& GetPosition(ComponentHandle handle)
+		Vector3f GetPosition(ComponentHandle handle) const
 		{
 			return m_Data.Position[handle.index];
 		}
+		
+		void SetPosition(ComponentHandle handle, Vector3f& position)
+		{
+			m_Data.Position[handle.index] = position;
+		}
 
-		float& GetRotation(ComponentHandle handle)
+		float GetRotation(ComponentHandle handle) const
 		{
 			return m_Data.Rotation[handle.index];
 		}
+		
+		void SetRotation(ComponentHandle handle, float rotation)
+		{
+			m_Data.Rotation[handle.index] = rotation;
+		}
 
-		Vector3f& GetScale(ComponentHandle handle)
+		Vector3f GetScale(ComponentHandle handle) const
 		{
 			return m_Data.Scale[handle.index];
+		}
+		
+		void SetScale(ComponentHandle handle, Vector3f& scale)
+		{
+			m_Data.Scale[handle.index] = scale;
 		}
 		
 		void OnCreateEntity(Entity entity) override
@@ -59,4 +74,30 @@ namespace ecs2
 		}
 	};
 
+	class TransformFacade
+	{
+		TransformComponentSystem* component;
+		Entity entity;
+		ComponentHandle handle;
+	public:
+		static TransformFacade Create(Entity entity, TransformComponentSystem* component)
+		{
+			TransformFacade facade;
+			facade.entity = entity;
+			facade.component = component;
+			facade.handle = component->GetHandle(entity);
+			
+			return facade;
+		}
+		
+		Vector3f GetPosition() const
+		{
+			return component->GetPosition(handle);
+		}
+		
+		void SetPosition(Vector3f& position)
+		{
+			return component->SetPosition(handle, position);
+		}
+	};
 }

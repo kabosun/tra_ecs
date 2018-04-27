@@ -55,5 +55,32 @@ namespace ecs2
 		}
 	};
 	
+	class HealthFacade
+	{
+		HealthComponentSystem* component;
+		Entity entity;
+	public:
+		static HealthFacade Create(Entity entity, HealthComponentSystem* component)
+		{
+			HealthFacade facade;
+			facade.entity = entity;
+			facade.component = component;
+			
+			return facade;
+		}
+		
+		Health GetHealth() const
+		{
+			ComponentHandle handle = component->GetHandle(entity);
+			return component->GetHealth(handle);
+		}
+		
+		void SetHealth(Health& health)
+		{
+			ComponentHandle handle = component->GetHandle(entity);
+			auto&& value = component->GetHealth(handle);
+			value = health;
+		}
+	};
 }
 

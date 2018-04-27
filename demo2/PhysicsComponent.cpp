@@ -11,13 +11,15 @@ namespace ecs2
 		for (int i = 0; i<m_Data.Size; i++)
 		{
 			auto handle = transformComponentSystem->GetHandle(m_Data.Entity[i]);
-			Vector3f& position = transformComponentSystem->GetPosition(handle);
+			Vector3f position = transformComponentSystem->GetPosition(handle);
 
 			Vector3f& velocity = m_Data.Velocity[i];
 			Vector3f& accelaration = m_Data.Acceleration[i];
 
 			velocity += accelaration * dt;
 			position += velocity * dt;
+			
+			transformComponentSystem->SetPosition(handle, position);
 		}
 	}
 

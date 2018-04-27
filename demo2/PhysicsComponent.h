@@ -54,4 +54,44 @@ namespace ecs2
 		}
 	};
 
+	class PhysicsFacade
+	{
+		PhysicsComponentSystem* component;
+		Entity entity;
+	public:
+		static PhysicsFacade Create(Entity entity, PhysicsComponentSystem* component)
+		{
+			PhysicsFacade facade;
+			facade.entity = entity;
+			facade.component = component;
+			
+			return facade;
+		}
+		
+		Vector3f GetVelocity() const
+		{
+			ComponentHandle handle = component->GetHandle(entity);
+			return component->GetVelocity(handle);
+		}
+		
+		void SetVelocity(Vector3f& velocity)
+		{
+			ComponentHandle handle = component->GetHandle(entity);
+			auto&& value = component->GetVelocity(handle);
+			value = velocity;
+		}
+		
+		Vector3f GetAccelaration() const
+		{
+			ComponentHandle handle = component->GetHandle(entity);
+			return component->GetAccelaration(handle);
+		}
+		
+		void SetAccelaration(Vector3f& accelaration)
+		{
+			ComponentHandle handle = component->GetHandle(entity);
+			auto&& value = component->GetAccelaration(handle);
+			value = accelaration;
+		}
+	};
 }
