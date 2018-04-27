@@ -30,7 +30,7 @@ namespace ecs2
 			return m_Data.Position[handle.index];
 		}
 		
-		void SetPosition(ComponentHandle handle, Vector3f& position)
+		void SetPosition(ComponentHandle handle, const Vector3f& position)
 		{
 			m_Data.Position[handle.index] = position;
 		}
@@ -50,7 +50,7 @@ namespace ecs2
 			return m_Data.Scale[handle.index];
 		}
 		
-		void SetScale(ComponentHandle handle, Vector3f& scale)
+		void SetScale(ComponentHandle handle, const Vector3f& scale)
 		{
 			m_Data.Scale[handle.index] = scale;
 		}
@@ -95,9 +95,29 @@ namespace ecs2
 			return component->GetPosition(handle);
 		}
 		
-		void SetPosition(Vector3f& position)
+		void SetPosition(const Vector3f& position)
 		{
-			return component->SetPosition(handle, position);
+			component->SetPosition(handle, position);
+		}
+
+		float GetRotation() const
+		{
+			return component->GetRotation(handle);
+		}
+
+		void SetRotation(float rotation)
+		{
+			component->SetRotation(handle, rotation);
+		}
+
+		Vector3f GetScale() const
+		{
+			return component->GetScale(handle);
+		}
+
+		void SetScale(const Vector3f& scale)
+		{
+			component->SetScale(handle, scale);
 		}
 	};
 }

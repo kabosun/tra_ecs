@@ -26,14 +26,24 @@ namespace ecs2
 	{
 	public:
 
-		Vector3f& GetVelocity(ComponentHandle handle)
+		Vector3f GetVelocity(ComponentHandle handle)
 		{
 			return m_Data.Velocity[handle.index];
 		}
 
-		Vector3f& GetAccelaration(ComponentHandle handle)
+		void SetVelocity(ComponentHandle handle, const Vector3f& velocity)
+		{
+			m_Data.Velocity[handle.index] = velocity;
+		}
+
+		Vector3f GetAcceleration(ComponentHandle handle)
 		{
 			return m_Data.Acceleration[handle.index];
+		}
+
+		void SetAcceleration(ComponentHandle handle, const Vector3f& acceleration)
+		{
+			m_Data.Acceleration[handle.index] = acceleration;
 		}
 
 		void Update(EntityRegistry* eRgistry, float dt) override;
@@ -74,24 +84,23 @@ namespace ecs2
 			return component->GetVelocity(handle);
 		}
 		
-		void SetVelocity(Vector3f& velocity)
+		void SetVelocity(const Vector3f& velocity)
 		{
 			ComponentHandle handle = component->GetHandle(entity);
 			auto&& value = component->GetVelocity(handle);
 			value = velocity;
 		}
 		
-		Vector3f GetAccelaration() const
+		Vector3f GetAcceleration() const
 		{
 			ComponentHandle handle = component->GetHandle(entity);
-			return component->GetAccelaration(handle);
+			return component->GetAcceleration(handle);
 		}
 		
-		void SetAccelaration(Vector3f& accelaration)
+		void SetAcceleration(const Vector3f& acceleration)
 		{
 			ComponentHandle handle = component->GetHandle(entity);
-			auto&& value = component->GetAccelaration(handle);
-			value = accelaration;
+			component->SetAcceleration(handle, acceleration);
 		}
 	};
 }

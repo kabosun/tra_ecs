@@ -24,9 +24,14 @@ namespace ecs2
 	class HealthComponentSystem : public ComponentSystem<HealthComponent>, public IUpdatable
 	{
 	public:
-		Health& GetHealth(ComponentHandle handle)
+		Health GetHealth(ComponentHandle handle) const
 		{
 			return m_Data.Health[handle.index];
+		}
+
+		void SetHealth(ComponentHandle handle, const Health& health)
+		{
+			m_Data.Health[handle.index] = health;
 		}
 		
 		void Update(EntityRegistry* eRegistry, float dt) override
@@ -75,11 +80,10 @@ namespace ecs2
 			return component->GetHealth(handle);
 		}
 		
-		void SetHealth(Health& health)
+		void SetHealth(const Health& health)
 		{
 			ComponentHandle handle = component->GetHandle(entity);
-			auto&& value = component->GetHealth(handle);
-			value = health;
+			component->SetHealth(handle, health);
 		}
 	};
 }
