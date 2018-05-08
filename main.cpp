@@ -1,71 +1,79 @@
 #include <iostream>
 #include <memory>
 #include "demo2/ECS2.h"
+#include "demo2/Facade.h"
+#include "demo2/Physics.h"
 
 using namespace ecs2;
-
-enum ComponentType
-{
-	TRANSFORM = 1,
-	PHYSICS = 2,
-	LIFETIME = 4,
-	HEALTH = 8,
-	EXPLODE = 16,
-	ALL = 31,
-};
-
 
 int main(int argc, const char * argv[]) {
 
 	ecs2::mt.seed(ecs2::rand());
+	
+	const int MAX_COMPONENT = 128;
 
-	// サンプル
-	auto registry = std::make_shared<EntityRegistry>();
+	Physics physics;
+	EntityRegistry entityRegistry;
+	ComponentRegistry registry(&entityRegistry);
+	auto transformComponent = registry.AddComponent<TransformComponent>();
+	auto rigidbodyComponent = registry.AddUpdatableComponent<RigidBodyComponent>();
+	auto lifetimeComponent = registry.AddUpdatableComponent<LifetimeComponent>();
+	auto healthComponent = registry.AddUpdatableComponent<HealthComponent>();
+	auto explodeComponent = registry.AddComponent<ExplodeComponent>();
+	auto ballbehaviorComponent = registry.AddUpdatableComponent<BallBehaviorComponent>();
 
-	ComponentSystemRegistry componentSystemRegistry(registry);
-	componentSystemRegistry.Add<TransformComponentSystem>();
-	componentSystemRegistry.AddUpdatable<PhysicsComponentSystem>();
-	componentSystemRegistry.AddUpdatable<LifetimeComponentSystem>();
-	componentSystemRegistry.AddUpdatable<HealthComponentSystem>();
-	componentSystemRegistry.Add<ExplodeComponentSystem>();
-
-	auto transformComponent = componentSystemRegistry.Get<TransformComponentSystem>();
-	auto physicsComponent = componentSystemRegistry.Get<PhysicsComponentSystem>();
-	auto lifetimeComponent = componentSystemRegistry.Get<LifetimeComponentSystem>();
-	auto healthComponent = componentSystemRegistry.Get<HealthComponentSystem>();
-	auto explodeComponent = componentSystemRegistry.Get<ExplodeComponentSystem>();
-
-	// event
-	registry->AddEventListener(explodeComponent.get());
-
-
+	transformComponent->Initialize(entityRegistry, MAX_COMPONENT);
+	rigidbodyComponent->Initialize(entityRegistry, MAX_COMPONENT);
+	lifetimeComponent->Initialize(entityRegistry, MAX_COMPONENT);
+	healthComponent->Initialize(entityRegistry, MAX_COMPONENT);
+	explodeComponent->Initialize(entityRegistry, MAX_COMPONENT);
+	ballbehaviorComponent->Initialize(entityRegistry, MAX_COMPONENT);
+	
 	float dt = 1.0f;
+	
+	// init
+	int width = 200;
+	int height = 200;
+	int block_left = (width - 50) / 2;
+	int block_top = 30;
+	
+	// block
+	for (int i=0; i<10; i++)
+	{
+		Entity e = registry.CreateEntity();
+		transformComponent->Attach(e);
+		rigidbodyComponent->Attach(e);
+		lifetimeComponent->Attach(e);
+		
+		EntityFacade entity = EntityFacade(&registry, e);
+		entity.Transform().SetPosition(Vector3f(block_left + i%5*20, block_top + i/5*10, 0));
+		entity.Lifetime().SetLifetime(Health(10, 10));
+	}
+	
+	// ball
+	for (int i=0; i<2; i++)
+	{
+		Entity e = registry.CreateEntity();
+		transformComponent->Attach(e);
+		rigidbodyComponent->Attach(e);
+		healthComponent->Attach(e);
+		
+		EntityFacade entity = EntityFacade(&registry, e);
+		entity.Transform().SetPosition(Vector3f(width/2, height/2+50, 0));
+		entity.Physics().SetVelocity(Vector3f(0, 1, 0));
+		entity.Health().SetHealth(Health(1, 1));
+		
+	}
+	
 	for (int i=0; i<128; i++)
 	{
 		std::cout << "Frame:" << i << std::endl;
 
-		{
-			Entity e = registry->Create();
-			EntityFacade entity = EntityFacade(&componentSystemRegistry, e);
+		registry.Update(dt);
+		
+		physics.Update(dt);
 
-			entity.CreateComponent(ComponentType::ALL);
-
-			Vector3f position(10, 20, 0);
-			entity.Transform().SetPosition(position);
-
-			Vector3f velocity(5, 3.5, 0);
-			entity.Physics().SetVelocity(velocity);
-
-			Health health(100, 100);
-			entity.Health().SetHealth(health);
-
-			std::cout << "Create ID:" << e.Index() << " (" << e.Generation() << ") X:" << position.X << " Y:" << position.Y << std::endl;
-		}
-
-		componentSystemRegistry.Update(dt);
-
-		componentSystemRegistry.GC();
-
+		registry.GC();
 
 		std::cout << "StorageSize:" << transformComponent->Size() << std::endl;
 	}

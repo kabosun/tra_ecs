@@ -1,6 +1,6 @@
 #pragma once
 
-#include <vector>
+#include <list>
 #include <deque>
 #include <iostream>
 #include <memory>
@@ -20,7 +20,7 @@ namespace ecs2
 
 	class EntityEvent
 	{
-		std::vector<IEntityEventListener*> m_EventListener;
+		std::list<IEntityEventListener*> m_EventListener;
 
 	public:
 
@@ -31,7 +31,7 @@ namespace ecs2
 
 		void RemoveListener(IEntityEventListener* listener)
 		{
-			// TODO
+			m_EventListener.remove(listener);
 		}
 
 		void SendCreateEntityEvent(Entity e)
@@ -58,6 +58,9 @@ namespace ecs2
 		std::deque<int> m_Free;
 		
 	public:
+		/**
+		 * エンティティを生成します。
+		 */
 		Entity Create()
 		{
 			int index = 0;
@@ -75,17 +78,24 @@ namespace ecs2
 			
 			Entity entity = Entity::Make(index, m_Generation[index]);
 
+			// 生成イベントを通知する
 			SendCreateEntityEvent(entity);
 
 			return entity;
 		}
 		
+		/**
+		 * 指定されたエンティティが生存しているか判定します。
+		 */
 		bool Alive(Entity entity) const
 		{
 			const int index = entity.Index();
 			return m_Generation[index] == entity.Generation();
 		}
 		
+		/**
+		 * エンティティを削除します。
+		 */
 		void Remove(Entity entity)
 		{
 			if (Alive(entity))
@@ -94,11 +104,12 @@ namespace ecs2
 				++m_Generation[index];
 				m_Free.push_back(index);
 
+				// 削除イベントを通知する
 				SendRemoveEntityEvent(entity);
 				
 				std::cout << "Destory Entity " << index << std::endl;
 			}
 		}
 	};
-
+	
 }

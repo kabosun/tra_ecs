@@ -1,122 +1,126 @@
 #pragma once
 
-#include <array>
+#include <vector>
 #include "../ecs2/Entity.h"
-#include "../ecs2/ComponentSystem.h"
+#include "../ecs2/Component.h"
 
-namespace ecs2
+using namespace ecs2;
+
+// コンポーネント
+struct _TransformComponent
 {
-	// コンポーネント
-	struct TransformComponent
-	{
-		static const int MAX_COMPONENT = 128;
-		
-		// 必須
-		int Size = 0;
-		std::array<Entity, MAX_COMPONENT> Entity;
-		
-		// ユーザー定義
-		std::array<Vector3f, MAX_COMPONENT> Position;
-		std::array<float, MAX_COMPONENT> Rotation;
-		std::array<Vector3f, MAX_COMPONENT> Scale;
-	};
+	// ユーザー定義
+	std::vector<Vector3f> Position;
+	std::vector<float> Rotation;
+	std::vector<Vector3f> Scale;
+};
+
+class TransformComponent : public Component, public IEntityEventListener
+{
+	_TransformComponent m_Data;
 	
-	class TransformComponentSystem : public ComponentSystem<TransformComponent>, public IEntityEventListener
+public:
+	void Initialize(EntityRegistry& registry, int maxSize) override
 	{
-	public:
+		Component::Initialize(registry, maxSize);
+		
+		m_Data.Position.resize(maxSize);
+		m_Data.Rotation.resize(maxSize);
+		m_Data.Scale.resize(maxSize);
+	}
+	
+	void OnCreateEntity(Entity entity) override
+	{}
+	
+	void OnRemoveEntity(Entity entity) override
+	{}
 
-		Vector3f GetPosition(ComponentHandle handle) const
-		{
-			return m_Data.Position[handle.index];
-		}
-		
-		void SetPosition(ComponentHandle handle, const Vector3f& position)
-		{
-			m_Data.Position[handle.index] = position;
-		}
-
-		float GetRotation(ComponentHandle handle) const
-		{
-			return m_Data.Rotation[handle.index];
-		}
-		
-		void SetRotation(ComponentHandle handle, float rotation)
-		{
-			m_Data.Rotation[handle.index] = rotation;
-		}
-
-		Vector3f GetScale(ComponentHandle handle) const
-		{
-			return m_Data.Scale[handle.index];
-		}
-		
-		void SetScale(ComponentHandle handle, const Vector3f& scale)
-		{
-			m_Data.Scale[handle.index] = scale;
-		}
-		
-		void OnCreateEntity(Entity entity) override
-		{}
-		
-		void OnRemoveEntity(Entity entity) override
-		{}
-		
-	protected:
-		void Reset(int index) override
-		{
-		}
-		
-		void Compact(int index, int lastIndex) override
-		{
-			m_Data.Position[index] = m_Data.Position[lastIndex];
-			m_Data.Rotation[index] = m_Data.Rotation[lastIndex];
-			m_Data.Scale[index] = m_Data.Scale[lastIndex];
-		}
-	};
-
-	class TransformFacade final
+	Vector3f GetPosition(ComponentHandle handle) const
 	{
-		TransformComponentSystem* component;
-		ComponentHandle handle;
+		return m_Data.Position[handle.index];
+	}
+	
+	void SetPosition(ComponentHandle handle, const Vector3f& position)
+	{
+		m_Data.Position[handle.index] = position;
+	}
 
-	public:
-		TransformFacade(Entity entity, TransformComponentSystem* component)
-		{
-			this->component = component;
-			this->handle = component->GetHandle(entity);
-		}
+	float GetRotation(ComponentHandle handle) const
+	{
+		return m_Data.Rotation[handle.index];
+	}
+	
+	void SetRotation(ComponentHandle handle, float rotation)
+	{
+		m_Data.Rotation[handle.index] = rotation;
+	}
 
-		Vector3f GetPosition() const
-		{
-			return component->GetPosition(handle);
-		}
+	Vector3f GetScale(ComponentHandle handle) const
+	{
+		return m_Data.Scale[handle.index];
+	}
+	
+	void SetScale(ComponentHandle handle, const Vector3f& scale)
+	{
+		m_Data.Scale[handle.index] = scale;
+	}
+	
+protected:
+	void Reset(int index) override
+	{
+	}
+	
+	void Compact(int index, int lastIndex) override
+	{
+		m_Data.Position[index] = m_Data.Position[lastIndex];
+		m_Data.Rotation[index] = m_Data.Rotation[lastIndex];
+		m_Data.Scale[index] = m_Data.Scale[lastIndex];
+	}
+};
 
-		TransformFacade& SetPosition(const Vector3f& position)
-		{
-			component->SetPosition(handle, position);
-			return *this;
-		}
+class TransformFacade final
+{
+	TransformComponent* component;
+	ComponentHandle handle;
 
-		float GetRotation() const
-		{
-			return component->GetRotation(handle);
-		}
+public:
+	TransformFacade(Entity entity, TransformComponent* component)
+	{
+		this->component = component;
+		this->handle = component->GetHandle(entity);
+	}
 
-		TransformFacade& SetRotation(float rotation)
-		{
-			component->SetRotation(handle, rotation);
-			return *this;
-		}
+	Vector3f GetPosition() const
+	{
+		return component->GetPosition(handle);
+	}
 
-		Vector3f GetScale() const
-		{
-			return component->GetScale(handle);
-		}
+	TransformFacade& SetPosition(const Vector3f& position)
+	{
+		component->SetPosition(handle, position);
+		return *this;
+	}
 
-		TransformFacade& SetScale(const Vector3f& scale)
-		{
-			component->SetScale(handle, scale);
-			return *this;
-		}
-	};
-}
+	float GetRotation() const
+	{
+		return component->GetRotation(handle);
+	}
+
+	TransformFacade& SetRotation(float rotation)
+	{
+		component->SetRotation(handle, rotation);
+		return *this;
+	}
+
+	Vector3f GetScale() const
+	{
+		return component->GetScale(handle);
+	}
+
+	TransformFacade& SetScale(const Vector3f& scale)
+	{
+		component->SetScale(handle, scale);
+		return *this;
+	}
+};
+

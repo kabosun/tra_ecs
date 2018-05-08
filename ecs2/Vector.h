@@ -42,11 +42,20 @@ struct Vector3
 		return *this;
 	}
 	
-	Vector3<T>& operator-=(const T v)
+	Vector3<T>& operator*=(const T v)
 	{
 		X *= v;
 		Y *= v;
 		Z *= v;
+		
+		return *this;
+	}
+	
+	Vector3<T>& operator/=(const T v)
+	{
+		X /= v;
+		Y /= v;
+		Z /= v;
 		
 		return *this;
 	}
@@ -95,4 +104,22 @@ Vector3<T> operator*(const Vector3<T>& v, const T u)
 	
 	return t;
 }
+
+
+using Vector3f = Vector3<float>;
+
+template<typename T>
+struct MaxValue
+{
+	T Current;
+	T Max;
+	
+	MaxValue()
+	: Current(0), Max(0)
+	{}
+	
+	MaxValue(T current, T max)
+	: Current(current), Max(max)
+	{}
+};
 

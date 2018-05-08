@@ -10,30 +10,36 @@ using namespace ecs2;
 class EntityFacade final
 {
 	Entity entity;
-	ComponentSystemRegistry* componentSystemRegistry;
+	ComponentRegistry* registry;
 
 public:
-	EntityFacade(ComponentSystemRegistry* componentSystemRegistry, Entity entity)
+	EntityFacade(ComponentRegistry* registry, Entity entity)
 	{
 		this->entity = entity;
-		this->componentSystemRegistry = componentSystemRegistry;
+		this->registry = registry;
 	}
 
 	TransformFacade Transform()
 	{
-		auto&& component = componentSystemRegistry->Get<TransformComponentSystem>();
+		auto&& component = registry->GetComponent<TransformComponent>();
 		return TransformFacade(entity, component.get());
 	}
 
-	PhysicsFacade Physics()
+	RigidBodyFacade Physics()
 	{
-		auto&& component = componentSystemRegistry->Get<SumoPhysicsComponentSystem>();
-		return PhysicsFacade(entity, component.get());
+		auto&& component = registry->GetComponent<RigidBodyComponent>();
+		return RigidBodyFacade(entity, component.get());
 	}
 
 	HealthFacade Health()
 	{
-		auto&& component = componentSystemRegistry->Get<HealthComponentSystem>();
+		auto&& component = registry->GetComponent<HealthComponent>();
 		return HealthFacade(entity, component.get());
+	}
+	
+	LifetimeFacade Lifetime()
+	{
+		auto&& component = registry->GetComponent<LifetimeComponent>();
+		return LifetimeFacade(entity, component.get());
 	}
 };

@@ -1,51 +1,47 @@
 #pragma once
 
-#include <array>
+#include <vector>
 #include "../ecs2/Entity.h"
-#include "../ecs2/ComponentSystem.h"
+#include "../ecs2/Component.h"
 #include <iostream>
 
-namespace ecs2
+using namespace ecs2;
+
+// コンポーネント
+struct _ExplodeComponent
 {
-	// コンポーネント
-	struct ExplodeComponent
-	{
-		static const int MAX_COMPONENT = 128;
-		
-		// 必須
-		int Size = 0;
-		std::array<Entity, MAX_COMPONENT> Entity;
-		
-		// ユーザー定義
-		std::array<int, MAX_COMPONENT> ExplodePerticileId;
-	};
+	// ユーザー定義
+	std::vector<int> ExplodePerticileId;
+};
+
+
+class ExplodeComponent : public Component, public IEntityEventListener
+{
+	class TransformComponent* m_TransformComponent = nullptr;
+	_ExplodeComponent m_Data;
 	
+public:
 	
-	class ExplodeComponentSystem : public ComponentSystem<ExplodeComponent>, public IEntityEventListener
+	void Initialize(EntityRegistry& registry, int maxSize) override;
+	
+	void OnCreateEntity(Entity entity) override;
+	
+	void OnRemoveEntity(Entity entity) override;
+
+	int GetExplodePerticileId(ComponentHandle handle)
 	{
-		class TransformComponentSystem* m_TransformComponentSystem = nullptr;
+		return m_Data.ExplodePerticileId[handle.index];
+	}
+	
+protected:
+	void Reset(int index) override
+	{
+		m_Data.ExplodePerticileId[index] = 0;
+	}
+	
+	void Compact(int index, int lastIndex) override
+	{
+		m_Data.ExplodePerticileId[index] = m_Data.ExplodePerticileId[lastIndex];
+	}
+};
 
-	public:
-
-		int GetExplodePerticileId(ComponentHandle handle)
-		{
-			return m_Data.ExplodePerticileId[handle.index];
-		}
-
-		void OnCreateEntity(Entity entity) override;
-
-		void OnRemoveEntity(Entity entity) override;
-		
-	protected:
-		void Reset(int index) override
-		{
-			m_Data.ExplodePerticileId[index] = 0;
-		}
-		
-		void Compact(int index, int lastIndex) override
-		{
-			m_Data.ExplodePerticileId[index] = m_Data.ExplodePerticileId[lastIndex];
-		}
-	};
-
-}

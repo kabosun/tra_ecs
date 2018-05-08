@@ -1,5 +1,8 @@
 #pragma once
 
+#include <random>
+#include "Vector.h"
+
 namespace ecs2
 {
 	using EntityId = unsigned int;
@@ -10,6 +13,9 @@ namespace ecs2
 	const unsigned ENTITY_GENERATION_BITS = 8;
 	const unsigned ENTITY_GENERATION_MASK = (1<<ENTITY_GENERATION_BITS)-1;
 
+	static std::random_device rand;
+	static std::mt19937 mt;
+	
 	struct Entity
 	{
 		EntityId Id;
@@ -40,5 +46,4 @@ namespace ecs2
 			return Id != e.Id;
 		}
 	};
-
 }

@@ -1,87 +1,78 @@
 #pragma once
 
-#include <array>
+#include <vector>
 #include "../ecs2/Entity.h"
-#include "../ecs2/ComponentSystem.h"
+#include "../ecs2/Component.h"
 
-namespace ecs2
+using namespace ecs2;
+
+using Health = MaxValue<int>;
+
+// コンポーネント
+struct _HealthComponent
 {
-	using Health = MaxValue<int>;
+	// ユーザー定義
+	std::vector<Health> Health;
+};
 
-	// コンポーネント
-	struct HealthComponent
-	{
-		static const int MAX_COMPONENT = 128;
-		
-		// 必須
-		int Size = 0;
-		std::array<Entity, MAX_COMPONENT> Entity;
-		
-		// ユーザー定義
-		std::array<Health, MAX_COMPONENT> Health;
-	};
+class HealthComponent : public Component, public IUpdatable
+{
+	_HealthComponent m_Data;
 	
-	class HealthComponentSystem : public ComponentSystem<HealthComponent>, public IUpdatable
+public:
+	void Initialize(EntityRegistry& registry, int maxSize) override
 	{
-	public:
-		Health GetHealth(ComponentHandle handle) const
-		{
-			return m_Data.Health[handle.index];
-		}
-
-		void SetHealth(ComponentHandle handle, const Health& health)
-		{
-			m_Data.Health[handle.index] = health;
-		}
+		Component::Initialize(registry, maxSize);
 		
-		void Update(EntityRegistry* eRegistry, float dt) override
-		{
-			for (int i=0; i<m_Data.Size; i++)
-			{
-				Health& health = m_Data.Health[i];
-				if (health.Current <= 0)
-				{
-					// Destory Entity
-					eRegistry->Remove(m_Data.Entity[i]);
-				}
-			}
-		}
-		
-	protected:
-		void Reset(int index) override
-		{
-			m_Data.Health[index].Current = 10;
-			m_Data.Health[index].Max = 10;
-		}
-		
-		void Compact(int index, int lastIndex) override
-		{
-			m_Data.Health[index] = m_Data.Health[lastIndex];
-		}
-	};
-
-	class HealthFacade final
+		m_Data.Health.resize(maxSize);
+	}
+	
+	void Update(EntityRegistry& registry, float dt) override;
+	
+	Health GetHealth(ComponentHandle handle) const
 	{
-		HealthComponentSystem* component;
-		ComponentHandle handle;
+		return m_Data.Health[handle.index];
+	}
 
-	public:
-		HealthFacade(Entity entity, HealthComponentSystem* component)
-		{
-			this->component = component;
-			this->handle = component->GetHandle(entity);
-		}
+	void SetHealth(ComponentHandle handle, const Health& health)
+	{
+		m_Data.Health[handle.index] = health;
+	}
+	
+protected:
+	void Reset(int index) override
+	{
+		m_Data.Health[index].Current = 10;
+		m_Data.Health[index].Max = 10;
+	}
+	
+	void Compact(int index, int lastIndex) override
+	{
+		m_Data.Health[index] = m_Data.Health[lastIndex];
+	}
+};
 
-		Health GetHealth() const
-		{
-			return component->GetHealth(handle);
-		}
+class HealthFacade final
+{
+	HealthComponent* component;
+	ComponentHandle handle;
 
-		HealthFacade& SetHealth(const Health& health)
-		{
-			component->SetHealth(handle, health);
-			return *this;
-		}
-	};
-}
+public:
+	HealthFacade(Entity entity, HealthComponent* component)
+	{
+		this->component = component;
+		this->handle = component->GetHandle(entity);
+	}
+
+	Health GetHealth() const
+	{
+		return component->GetHealth(handle);
+	}
+
+	HealthFacade& SetHealth(const Health& health)
+	{
+		component->SetHealth(handle, health);
+		return *this;
+	}
+};
 

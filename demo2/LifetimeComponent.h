@@ -1,63 +1,79 @@
 #pragma once
 
-#include <array>
+#include <vector>
 #include "../ecs2/Entity.h"
-#include "../ecs2/ComponentSystem.h"
+#include "../ecs2/Component.h"
 
-namespace ecs2
+using namespace ecs2;
+
+using Lifetime = MaxValue<int>;
+
+// コンポーネント
+struct _LifetimeComponent
 {
-	using Lifetime = MaxValue<int>;
+	// ユーザー定義
+	std::vector<Lifetime> Lifetime;
+};
+
+class LifetimeComponent : public Component, public IUpdatable
+{
+	_LifetimeComponent m_Data;
 	
-	// コンポーネント
-	struct LifetimeComponent
+public:
+	void Initialize(EntityRegistry& registry, int maxSize) override
 	{
-		static const int MAX_COMPONENT = 128;
+		Component::Initialize(registry, maxSize);
 		
-		// 必須
-		int Size = 0;
-		std::array<Entity, MAX_COMPONENT> Entity;
-		
-		// ユーザー定義
-		std::array<Lifetime, MAX_COMPONENT> Lifetime;
-	};
+		m_Data.Lifetime.resize(maxSize);
+	}
 	
-	class LifetimeComponentSystem : public ComponentSystem<LifetimeComponent>, public IUpdatable
+	void Update(EntityRegistry& registry, float dt) override;
+	
+	Lifetime GetLifetime(ComponentHandle handle)
 	{
-	public:
-		Lifetime& GetLifetime(ComponentHandle handle)
-		{
-			return m_Data.Lifetime[handle.index];
-		}
-		
-		void Update(EntityRegistry* eRegistry, float dt) override
-		{
-			for (int i=0; i<m_Data.Size; i++)
-			{
-				Lifetime& lifetime = m_Data.Lifetime[i];
-				if (lifetime.Current <= 0)
-				{
-					// Destory Entity
-					eRegistry->Remove(m_Data.Entity[i]);
-				}
-				else
-				{
-					lifetime.Current -= dt;
-				}
-			}
-		}
-		
-	protected:
-		void Reset(int index) override
-		{
-			m_Data.Lifetime[index].Current = 10;
-			m_Data.Lifetime[index].Max = 10;
-		}
-		
-		void Compact(int index, int lastIndex) override
-		{
-			m_Data.Lifetime[index] = m_Data.Lifetime[lastIndex];
-		}
-	};
+		return m_Data.Lifetime[handle.index];
+	}
 	
-}
+	void SetLifetime(ComponentHandle handle, const Lifetime& lifetime)
+	{
+		m_Data.Lifetime[handle.index] = lifetime;
+	}
+	
+protected:
+	void Reset(int index) override
+	{
+		m_Data.Lifetime[index].Current = 10;
+		m_Data.Lifetime[index].Max = 10;
+	}
+	
+	void Compact(int index, int lastIndex) override
+	{
+		m_Data.Lifetime[index] = m_Data.Lifetime[lastIndex];
+	}
+};
+
+
+class LifetimeFacade final
+{
+	LifetimeComponent* component;
+	ComponentHandle handle;
+	
+public:
+	LifetimeFacade(Entity entity, LifetimeComponent* component)
+	{
+		this->component = component;
+		this->handle = component->GetHandle(entity);
+	}
+	
+	Lifetime GetLifetime() const
+	{
+		return component->GetLifetime(handle);
+	}
+	
+	LifetimeFacade& SetLifetime(const Lifetime& lifetime)
+	{
+		component->SetLifetime(handle, lifetime);
+		return *this;
+	}
+};
 
