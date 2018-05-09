@@ -12,6 +12,11 @@ namespace ecs2
 	struct ComponentHandle
 	{
 		int index;
+
+		bool IsValid() const
+		{
+			return index != -1;
+		}
 	};
 
 	class IUpdatable
@@ -42,6 +47,12 @@ namespace ecs2
 		
 		// GCが実行されたときにcomponentを再配置する
 		virtual void Compact(int index, int lastIndex) = 0;
+
+		virtual void OnCreate(int index)
+		{}
+
+		virtual void OnRemove(int index)
+		{}
 		
 		ComponentRegistry* ComponentRegistry()
 		{
@@ -82,6 +93,8 @@ namespace ecs2
 				m_LUTable[entity.Id] = n;
 				++m_Size;
 				Reset(n);
+
+				OnCreate(n);
 				
 				ComponentHandle h = { n };
 				return h;
@@ -90,6 +103,9 @@ namespace ecs2
 			{
 				auto n = m_LUTable[entity.Id];
 				Reset(n);
+
+				OnCreate(n);
+
 				ComponentHandle h = { m_LUTable[entity.Id] };
 				return h;
 			}
@@ -119,6 +135,8 @@ namespace ecs2
 		// GCされたコンポーネントを削除します
 		void Remove(int index)
 		{
+			OnRemove(index);
+
 			int lastIndex = m_Size - 1;
 			Entity entity = m_Entity[index];
 			Entity lastEntity = m_Entity[lastIndex];

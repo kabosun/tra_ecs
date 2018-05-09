@@ -15,13 +15,14 @@ namespace ecs2
 		std::vector<std::shared_ptr<IUpdatable>> m_UpdatableSystems;
 		
 	public:
-		ComponentRegistry(EntityRegistry* registry)
-		{
-			m_EntityRegistry = registry;
-		}
 		
 		virtual ~ComponentRegistry()
 		{}
+
+		void Initialize(EntityRegistry* registry)
+		{
+			m_EntityRegistry = registry;
+		}
 		
 		template<typename T>
 		std::shared_ptr<T> AddComponent()
