@@ -28,6 +28,8 @@ namespace ecs2
 	class IComponent
 	{
 	public:
+
+		virtual ComponentHandle Attach(Entity entity) = 0;
 		virtual void GC(const EntityRegistry& registry) = 0;
 	};
 	
@@ -36,23 +38,16 @@ namespace ecs2
 		friend ComponentRegistry;
 		
 		ComponentRegistry* m_ComponentRegistry;
-		int m_Size = 0;
-		std::vector<Entity> m_Entity;
+		PackedArray<Entity> m_Entity;
+		std::unordered_map<EntityId, int> m_LUTable;
 
 	protected:
-		std::unordered_map<EntityId, int> m_LUTable;
 		
 		// entityを登録した時にcomponentを初期化する
 		virtual void Reset(int index) = 0;
 		
 		// GCが実行されたときにcomponentを再配置する
 		virtual void Compact(int index, int lastIndex) = 0;
-
-		virtual void OnCreate(int index)
-		{}
-
-		virtual void OnRemove(int index)
-		{}
 		
 		ComponentRegistry* ComponentRegistry()
 		{
@@ -66,11 +61,15 @@ namespace ecs2
 		virtual void Initialize(EntityRegistry& registry, int maxSize)
 		{
 			m_Entity.resize(maxSize);
+			m_LUTable.clear();
 		}
+
+		virtual void OnCreate(int index)
+		{}
 		
 		int Size() const
 		{
-			return m_Size;
+			return m_Entity.size();
 		}
 		
 		inline Entity GetEntity(int index) const
@@ -88,10 +87,9 @@ namespace ecs2
 		{
 			if (m_LUTable.count(entity.Id) == 0)
 			{
-				auto n = m_Size;
-				m_Entity[n] = entity;
+				auto n = m_Entity.size();
+				m_Entity.push_back(entity);
 				m_LUTable[entity.Id] = n;
-				++m_Size;
 				Reset(n);
 
 				OnCreate(n);
@@ -101,11 +99,6 @@ namespace ecs2
 			}
 			else
 			{
-				auto n = m_LUTable[entity.Id];
-				Reset(n);
-
-				OnCreate(n);
-
 				ComponentHandle h = { m_LUTable[entity.Id] };
 				return h;
 			}
@@ -115,9 +108,9 @@ namespace ecs2
 		{
 			int alive_in_row = 0;
 			
-			while (m_Size > 0 && alive_in_row < 4)
+			while (m_Entity.size() > 0 && alive_in_row < 4)
 			{
-				int n = mt() % m_Size;
+				int n = mt() % m_Entity.size();
 				if (registry.Alive(m_Entity[n]))
 				{
 					++alive_in_row;
@@ -135,20 +128,17 @@ namespace ecs2
 		// GCされたコンポーネントを削除します
 		void Remove(int index)
 		{
-			OnRemove(index);
-
-			int lastIndex = m_Size - 1;
+			int lastIndex = m_Entity.size() - 1;
 			Entity entity = m_Entity[index];
 			Entity lastEntity = m_Entity[lastIndex];
 			
 			// 削除したentityの位置に最後のコンポーネントをコピーする
-			m_Entity[index] = m_Entity[lastIndex];
+			m_Entity.remove(index);
+			Reset(index);
 			Compact(index, lastIndex);
 			
 			m_LUTable[lastEntity.Id] = index;
 			m_LUTable.erase(entity.Id);
-			
-			--m_Size;
 		}
 	};
 

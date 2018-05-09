@@ -15,7 +15,7 @@ struct _TransformComponent
 	std::vector<Vector3f> Scale;
 };
 
-class TransformComponent : public Component, public IEntityEventListener
+class TransformComponent : public ecs2::Component, public IEntityEventListener
 {
 	_TransformComponent m_Data;
 	

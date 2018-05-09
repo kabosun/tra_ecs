@@ -7,6 +7,8 @@
 
 using namespace ecs2;
 
+class TransformComponent;
+
 // コンポーネント
 struct _RigidBodyComponent
 {
@@ -20,6 +22,7 @@ struct _RigidBodyComponent
 class RigidBodyComponent : public Component, public IUpdatable, public IEntityEventListener
 {
 	_RigidBodyComponent m_Data;
+	TransformComponent* Transform;
 	
 public:
 	
@@ -30,6 +33,11 @@ public:
 		m_Data.Velocity.resize(maxSize);
 		m_Data.Acceleration.resize(maxSize);
 		m_Data.Friction.resize(maxSize);
+	}
+
+	void SetSharedComponent(TransformComponent* transform)
+	{
+		Transform = transform;
 	}
 	
 	void Update(EntityRegistry& registry, float dt) override;

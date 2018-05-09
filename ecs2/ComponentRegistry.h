@@ -50,6 +50,11 @@ namespace ecs2
 		{
 			return std::static_pointer_cast<T>(m_ComponentSystems[typeid(T)]);
 		}
+
+		ComponentHandle AttachComponent(Entity entity, std::type_index type)
+		{
+			return m_ComponentSystems[type]->Attach(entity);
+		}
 		
 		void Update(float dt)
 		{
@@ -67,11 +72,13 @@ namespace ecs2
 			}
 		}
 		
-#pragma mark - Entity
-		
-		Entity CreateEntity()
+		Entity CreateEntity(int archetype)
 		{
-			return m_EntityRegistry->Create();
+			Entity entity = m_EntityRegistry->Create();
+
+
+
+			return entity;
 		}
 		
 		bool AliveEntity(Entity entity) const

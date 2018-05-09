@@ -1,6 +1,7 @@
 #pragma once
 
 #include <random>
+#include <vector>
 #include "Vector.h"
 
 namespace ecs2
@@ -44,6 +45,48 @@ namespace ecs2
 		bool operator!=(const Entity& e) const
 		{
 			return Id != e.Id;
+		}
+	};
+
+	template<typename T>
+	class PackedArray
+	{
+		size_t m_Size = 0;
+		std::vector<T> m_Data;
+
+	public:
+		void resize(size_t size)
+		{
+			m_Data.resize(size);
+		}
+
+		void push_back(T& t)
+		{
+			m_Data[m_Size] = t;
+			m_Size++;
+		}
+
+		void remove(int index)
+		{
+			int lastIndex = m_Size - 1;
+			m_Data[index] = m_Data[lastIndex];
+
+			--m_Size;
+		}
+
+		int size() const
+		{
+			return m_Size;
+		}
+
+		const T& operator[](int i) const
+		{
+			return m_Data[i];
+		}
+
+		T& operator[](int i)
+		{
+			return m_Data[i];
 		}
 	};
 }
